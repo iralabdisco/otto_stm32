@@ -106,7 +106,7 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 		HAL_Delay(100);
-		if(pwm_value==2000)
+		if(pwm_value==800)
 			step = -100;
 		else if (pwm_value == 0)
 			step = 100;
@@ -177,7 +177,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 0;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 2000;
+  htim4.Init.Period = 799;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_PWM_Init(&htim4) != HAL_OK)

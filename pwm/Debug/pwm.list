@@ -4661,9 +4661,9 @@ int main(void)
 		HAL_Delay(100);
  8001da6:	2064      	movs	r0, #100	; 0x64
  8001da8:	f7fe fc24 	bl	80005f4 <HAL_Delay>
-		if(pwm_value==2000)
+		if(pwm_value==800)
  8001dac:	88fb      	ldrh	r3, [r7, #6]
- 8001dae:	f5b3 6ffa 	cmp.w	r3, #2000	; 0x7d0
+ 8001dae:	f5b3 7f48 	cmp.w	r3, #800	; 0x320
  8001db2:	d103      	bne.n	8001dbc <main+0x3c>
 			step = -100;
  8001db4:	f06f 0363 	mvn.w	r3, #99	; 0x63
@@ -4854,9 +4854,9 @@ static void MX_TIM4_Init(void)
  8001ec8:	4b1e      	ldr	r3, [pc, #120]	; (8001f44 <MX_TIM4_Init+0xac>)
  8001eca:	2200      	movs	r2, #0
  8001ecc:	609a      	str	r2, [r3, #8]
-  htim4.Init.Period = 2000;
+  htim4.Init.Period = 799;
  8001ece:	4b1d      	ldr	r3, [pc, #116]	; (8001f44 <MX_TIM4_Init+0xac>)
- 8001ed0:	f44f 62fa 	mov.w	r2, #2000	; 0x7d0
+ 8001ed0:	f240 321f 	movw	r2, #799	; 0x31f
  8001ed4:	60da      	str	r2, [r3, #12]
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
  8001ed6:	4b1b      	ldr	r3, [pc, #108]	; (8001f44 <MX_TIM4_Init+0xac>)
