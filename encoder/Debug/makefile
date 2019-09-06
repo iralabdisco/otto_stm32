@@ -37,8 +37,8 @@ encoder.list \
 all: encoder.elf secondary-outputs
 
 # Tool invocations
-encoder.elf: $(OBJS) $(USER_OBJS) /home/fdila/Projects/stm32-tests/encoder/STM32F767ZITX_FLASH.ld
-	arm-none-eabi-gcc -o "encoder.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/fdila/Projects/stm32-tests/encoder/STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="encoder.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+encoder.elf: $(OBJS) $(USER_OBJS) /home/fdila/Projects/otto/encoder/STM32F767ZITX_FLASH.ld
+	arm-none-eabi-gcc -o "encoder.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/fdila/Projects/otto/encoder/STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="encoder.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -39,11 +39,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
  17 .debug_line   0000682c  00000000  00000000  0004fd8b  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_str    000eb673  00000000  00000000  000565b7  2**0
+ 18 .debug_str    000eb66c  00000000  00000000  000565b7  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .comment      0000007b  00000000  00000000  00141c2a  2**0
+ 19 .comment      0000007b  00000000  00000000  00141c23  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000026bc  00000000  00000000  00141ca8  2**2
+ 20 .debug_frame  000026bc  00000000  00000000  00141ca0  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -3468,7 +3468,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
 		/*
 		 * un giro completo usando risoluzione 4x (encoder mode TI1 and TI2) è 148000
-		 * un giro completo usando risoluzine 2x è 74000
+		 * un giro completo usando risoluzione 2x è 74000
 		 */
 		i = TIM2->CNT;
  8001732:	f04f 4380 	mov.w	r3, #1073741824	; 0x40000000

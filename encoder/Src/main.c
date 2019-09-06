@@ -108,7 +108,7 @@ int main(void)
     /* USER CODE BEGIN 3 */
 		/*
 		 * un giro completo usando risoluzione 4x (encoder mode TI1 and TI2) è 148000
-		 * un giro completo usando risoluzine 2x è 74000
+		 * un giro completo usando risoluzione 2x è 74000
 		 */
 		i = TIM2->CNT;
 		i = TIM2->CNT;
