@@ -23,7 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "motor_driver.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,7 +54,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM4_Init(void);
 /* USER CODE BEGIN PFP */
-void user_pwm_setvalue(uint16_t value);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -93,10 +92,13 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  	// PIN D9
-	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
-	uint16_t pwm_value = 0;
-	int step = 100;
+
+  // PIN D9
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
+
+  setPWM(htim4, TIM_CHANNEL_4, 400);
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -105,14 +107,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-		HAL_Delay(100);
-		if(pwm_value==800)
-			step = -100;
-		else if (pwm_value == 0)
-			step = 100;
-
-		user_pwm_setvalue(pwm_value);
-		pwm_value+=step;
 
 	}
   /* USER CODE END 3 */
@@ -219,16 +213,6 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void user_pwm_setvalue(uint16_t value) {
-	TIM_OC_InitTypeDef sConfigOC;
-
-	sConfigOC.OCMode = TIM_OCMODE_PWM1;
-	sConfigOC.Pulse = value;
-	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
-	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
-	HAL_TIM_PWM_ConfigChannel(&htim4, &sConfigOC, TIM_CHANNEL_4);
-	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
-}
 
 /* USER CODE END 4 */
 

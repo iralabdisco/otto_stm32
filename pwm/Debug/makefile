@@ -37,8 +37,8 @@ pwm.list \
 all: pwm.elf secondary-outputs
 
 # Tool invocations
-pwm.elf: $(OBJS) $(USER_OBJS) /home/fdila/Projects/stm32-tests/pwm/STM32F767ZITX_FLASH.ld
-	arm-none-eabi-gcc -o "pwm.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/fdila/Projects/stm32-tests/pwm/STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="pwm.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+pwm.elf: $(OBJS) $(USER_OBJS) /home/fdila/Projects/otto/pwm/STM32F767ZITX_FLASH.ld
+	arm-none-eabi-gcc -o "pwm.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/fdila/Projects/otto/pwm/STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="pwm.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
