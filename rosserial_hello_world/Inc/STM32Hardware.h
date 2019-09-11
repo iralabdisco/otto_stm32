@@ -114,12 +114,9 @@ class STM32Hardware {
       }
 
       flush();
-
-
-      //HAL_UART_Transmit(&huart3, data, length, 100);
     }
 
-    unsigned long time(){ return __HAL_TIM_GET_COUNTER(htim); }
+    unsigned long time(){ return HAL_GetTick(); }
 
   protected:
 };
