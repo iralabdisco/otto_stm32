@@ -53,7 +53,7 @@ all: rosserial_test.elf secondary-outputs
 
 # Tool invocations
 rosserial_test.elf: $(OBJS) $(USER_OBJS) /home/fdila/Projects/otto/rosserial_test/STM32F767ZITX_FLASH.ld
-	arm-none-eabi-g++ -o "rosserial_test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/fdila/Projects/otto/rosserial_test/STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="rosserial_test.map" -Wl,--gc-sections -static --specs=nano_c_standard_cpp.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+	arm-none-eabi-g++ -o "rosserial_test.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/fdila/Projects/otto/rosserial_test/STM32F767ZITX_FLASH.ld" -Wl,-Map="rosserial_test.map" -Wl,--gc-sections -static  -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
