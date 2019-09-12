@@ -19,12 +19,11 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+#include <mainpp.h>
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <std_msgs/UInt8.h>
-#include <ros.h>
 
 /* USER CODE END Includes */
 
@@ -62,20 +61,11 @@ static void MX_DMA_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
-void led_cb(const std_msgs::UInt8& msg);
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-ros::Subscriber<std_msgs::UInt8> led_sub("led", &led_cb);
-
-void led_cb(const std_msgs::UInt8& msg){
-	int i = msg.data;
-	HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_15);
-	HAL_Delay(i);
-	HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_15);
-
-}
 /* USER CODE END 0 */
 
 /**
@@ -111,17 +101,13 @@ int main(void)
   MX_TIM2_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-	ros::NodeHandle nh;
-
-	nh.initNode();
-	nh.subscribe(led_sub);
-
+  setup();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1) {
-
+	loop();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
