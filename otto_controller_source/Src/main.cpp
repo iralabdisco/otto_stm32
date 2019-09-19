@@ -53,13 +53,13 @@ DMA_HandleTypeDef hdma_usart3_tx;
 
 /* Private function prototypes -----------------------------------------------*/
 void
-SystemClock_Config (void);
+SystemClock_Config(void);
 static void
-MX_GPIO_Init (void);
+MX_GPIO_Init(void);
 static void
-MX_DMA_Init (void);
+MX_DMA_Init(void);
 static void
-MX_USART3_UART_Init (void);
+MX_USART3_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -73,8 +73,7 @@ MX_USART3_UART_Init (void);
  * @brief  The application entry point.
  * @retval int
  */
-int
-main (void) {
+int main(void) {
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -82,23 +81,23 @@ main (void) {
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init ();
+  HAL_Init();
 
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
 
   /* Configure the system clock */
-  SystemClock_Config ();
+  SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_GPIO_Init ();
-  MX_DMA_Init ();
-  MX_USART3_UART_Init ();
+  MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -117,8 +116,7 @@ main (void) {
  * @brief System Clock Configuration
  * @retval None
  */
-void
-SystemClock_Config (void) {
+void SystemClock_Config(void) {
   RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
   RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
   RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = { 0 };
@@ -134,8 +132,8 @@ SystemClock_Config (void) {
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-  if (HAL_RCC_OscConfig (&RCC_OscInitStruct) != HAL_OK) {
-    Error_Handler ();
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+    Error_Handler();
   }
   /** Initializes the CPU, AHB and APB busses clocks 
    */
@@ -146,13 +144,13 @@ SystemClock_Config (void) {
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig (&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) {
-    Error_Handler ();
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) {
+    Error_Handler();
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART3;
   PeriphClkInitStruct.Usart3ClockSelection = RCC_USART3CLKSOURCE_PCLK1;
-  if (HAL_RCCEx_PeriphCLKConfig (&PeriphClkInitStruct) != HAL_OK) {
-    Error_Handler ();
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
+    Error_Handler();
   }
 }
 
@@ -161,8 +159,7 @@ SystemClock_Config (void) {
  * @param None
  * @retval None
  */
-static void
-MX_USART3_UART_Init (void) {
+static void MX_USART3_UART_Init(void) {
 
   /* USER CODE BEGIN USART3_Init 0 */
 
@@ -181,8 +178,8 @@ MX_USART3_UART_Init (void) {
   huart3.Init.OverSampling = UART_OVERSAMPLING_16;
   huart3.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
   huart3.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
-  if (HAL_UART_Init (&huart3) != HAL_OK) {
-    Error_Handler ();
+  if (HAL_UART_Init(&huart3) != HAL_OK) {
+    Error_Handler();
   }
   /* USER CODE BEGIN USART3_Init 2 */
 
@@ -193,8 +190,7 @@ MX_USART3_UART_Init (void) {
 /** 
  * Enable DMA controller clock
  */
-static void
-MX_DMA_Init (void) {
+static void MX_DMA_Init(void) {
 
   /* DMA controller clock enable */
   __HAL_RCC_DMA1_CLK_ENABLE()
@@ -202,11 +198,11 @@ MX_DMA_Init (void) {
 
   /* DMA interrupt init */
   /* DMA1_Stream1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority (DMA1_Stream1_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ (DMA1_Stream1_IRQn);
+  HAL_NVIC_SetPriority(DMA1_Stream1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream1_IRQn);
   /* DMA1_Stream3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority (DMA1_Stream3_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ (DMA1_Stream3_IRQn);
+  HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
 
 }
 
@@ -215,8 +211,7 @@ MX_DMA_Init (void) {
  * @param None
  * @retval None
  */
-static void
-MX_GPIO_Init (void) {
+static void MX_GPIO_Init(void) {
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOD_CLK_ENABLE()
@@ -232,8 +227,7 @@ MX_GPIO_Init (void) {
  * @brief  This function is executed in case of error occurrence.
  * @retval None
  */
-void
-Error_Handler (void) {
+void Error_Handler(void) {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
 
