@@ -53,7 +53,7 @@ all: otto_controller_source.elf secondary-outputs
 
 # Tool invocations
 otto_controller_source.elf: $(OBJS) $(USER_OBJS) /home/fdila/Projects/otto/otto_controller_source/STM32F767ZITX_FLASH.ld
-	arm-none-eabi-g++ -o "otto_controller_source.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/fdila/Projects/otto/otto_controller_source/STM32F767ZITX_FLASH.ld" --specs=nosys.specs -Wl,-Map="otto_controller_source.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+	arm-none-eabi-g++ -o "otto_controller_source.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m7 -T"/home/fdila/Projects/otto/otto_controller_source/STM32F767ZITX_FLASH.ld" -Wl,-Map="otto_controller_source.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
