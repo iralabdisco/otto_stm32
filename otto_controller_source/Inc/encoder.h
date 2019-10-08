@@ -6,6 +6,9 @@
 class Encoder {
  public:
   TIM_HandleTypeDef* timer_;
+  uint32_t elapsed_millis;
+  uint32_t kTicksPerRevolution = 148000;
+  float kPi = 3.14159;
 
   Encoder(TIM_HandleTypeDef* timer);
 
@@ -16,6 +19,8 @@ class Encoder {
   void ResetCount() {
     __HAL_TIM_SET_COUNTER(timer_, 0);
   }
+
+  float GetAngularVelocity();
 
 };
 #endif

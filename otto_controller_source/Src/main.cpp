@@ -55,6 +55,8 @@ DMA_HandleTypeDef hdma_usart3_tx;
 
 /* USER CODE BEGIN PV */
 
+Encoder left_encoder = Encoder(&htim2);
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -92,7 +94,6 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -114,15 +115,12 @@ int main(void)
 
   HAL_TIM_Base_Start_IT(&htim3);
 
-  Encoder encoder_left = Encoder(&htim2);
-  uint32_t count_left = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    //count_left = encoder_left.GetCount();
-    //encoder_left.ResetCount();
+    float velocity = left_encoder.GetAngularVelocity();
 
     /* USER CODE END WHILE */
 
@@ -491,8 +489,9 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
-  if (htim->Instance == TIM3)
-    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_8);
+  if (htim->Instance == TIM3){
+    float left_velocity = left_encoder.GetAngularVelocity();
+  }
 
 }
 
