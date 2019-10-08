@@ -6,13 +6,13 @@ Encoder::Encoder(TIM_HandleTypeDef* timer) {
   elapsed_millis = HAL_GetTick();
 }
 
-float Encoder::GetAngularVelocity(){
+float Encoder::GetLinearVelocity(){
   uint32_t ticks = this->GetCount();
   uint32_t previous_millis = this->elapsed_millis;
   this->elapsed_millis = HAL_GetTick();
-  float radiants = (ticks * 2 * kPi) / kTicksPerRevolution;
-  float angular_velocity = radiants /
+  float meters =  (ticks * kWheelCircumference) / kTicksPerRevolution;
+  float linear_velocity = meters /
       ((this->elapsed_millis - previous_millis) / 1000);
-  return angular_velocity;
+  return linear_velocity;
 }
 

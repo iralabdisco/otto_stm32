@@ -9,6 +9,7 @@ class Encoder {
   uint32_t elapsed_millis;
   uint32_t kTicksPerRevolution = 148000;
   float kPi = 3.14159;
+  float kWheelCircumference = 0.7539; //in meters
 
   Encoder(TIM_HandleTypeDef* timer);
 
