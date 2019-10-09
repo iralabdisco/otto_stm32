@@ -11,7 +11,13 @@ class Encoder {
   float kPi = 3.14159;
   float kWheelCircumference = 0.7539; //in meters
 
+  Encoder(){
+    timer_ = NULL;
+  }
+
   Encoder(TIM_HandleTypeDef* timer);
+
+  void Setup();
 
   int GetCount() {
     return __HAL_TIM_GET_COUNTER(timer_);
@@ -21,7 +27,8 @@ class Encoder {
     __HAL_TIM_SET_COUNTER(timer_, 0);
   }
 
-  float GetAngularVelocity();
+  float GetMeters();
+  float GetLinearVelocity();
 
 };
 #endif
