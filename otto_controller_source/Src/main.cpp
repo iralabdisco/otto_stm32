@@ -123,9 +123,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1) {
     meters = left_encoder.GetMeters();
-    meters = left_encoder.GetMeters();
-    meters = left_encoder.GetMeters();
-    meters = left_encoder.GetMeters();
+    HAL_Delay(100);
+
 
     /* USER CODE END WHILE */
 

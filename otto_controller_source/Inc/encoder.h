@@ -23,7 +23,8 @@ class Encoder {
   void Setup();
 
   int GetCount() {
-    return (__HAL_TIM_GET_COUNTER(timer_) - 2147483648);
+    int count = (__HAL_TIM_GET_COUNTER(timer_) - 2147483648);
+    return count;
   }
 
   void ResetCount() {

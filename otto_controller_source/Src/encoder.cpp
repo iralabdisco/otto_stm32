@@ -20,7 +20,8 @@ void Encoder::UpdateValues() {
 
 float Encoder::GetMeters() {
   uint32_t ticks = this->GetCount();
-  float meters = (ticks * kWheelCircumference) / kTicksPerRevolution;
+  float meters = ((float) ticks * kWheelCircumference) / kTicksPerRevolution;
+  this->ResetCount();
   return meters;
 }
 
