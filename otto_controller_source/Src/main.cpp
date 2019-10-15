@@ -122,7 +122,8 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    meters = left_encoder.GetMeters();
+    meters = left_encoder.GetCount();
+    left_encoder.ResetCount();
     HAL_Delay(100);
 
 
