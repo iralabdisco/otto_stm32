@@ -6,7 +6,16 @@ Encoder::Encoder(TIM_HandleTypeDef* timer) {
 
 void Encoder::Setup() {
   HAL_TIM_Encoder_Start(timer_, TIM_CHANNEL_ALL);
-  elapsed_millis = HAL_GetTick();
+  this->ResetCount();
+  this->previous_millis = 0;
+  this->current_millis = HAL_GetTick();
+}
+
+void Encoder::UpdateValues() {
+  this->previous_millis = this->current_millis;
+  this->current_millis = HAL_GetTick();
+  this->ticks = this->GetCount() - 2147483648;
+  this->ResetCount();
 }
 
 float Encoder::GetMeters() {
@@ -16,11 +25,9 @@ float Encoder::GetMeters() {
 }
 
 float Encoder::GetLinearVelocity() {
-  uint32_t previous_millis = this->elapsed_millis;
-  this->elapsed_millis = HAL_GetTick();
   float meters = this->GetMeters();
   float linear_velocity = meters
-      / ((this->elapsed_millis - previous_millis) / 1000);
+      / ((this->current_millis - previous_millis) / 1000);
   return linear_velocity;
 }
 
