@@ -10,7 +10,7 @@ class Encoder {
   uint32_t current_millis;
   int32_t ticks; //if negative the wheel is going backwards
 
-  uint32_t kTicksPerRevolution = 148000;
+  uint32_t kTicksPerRevolution = 74000; //x2 resolution
   float kPi = 3.14159;
   float kWheelCircumference = 0.7539; //in meters
 
@@ -23,13 +23,13 @@ class Encoder {
   void Setup();
 
   int GetCount() {
-    int count = ((int)__HAL_TIM_GET_COUNTER(timer_) - 2147483648);
+    int count = ((int)__HAL_TIM_GET_COUNTER(timer_) - ((timer_->Init.Period)/2));
     return count;
   }
 
   void ResetCount() {
     //set counter to half its maximum value
-    __HAL_TIM_SET_COUNTER(timer_, 2147483648);
+    __HAL_TIM_SET_COUNTER(timer_, (timer_->Init.Period)/2);
   }
 
   void UpdateValues();
