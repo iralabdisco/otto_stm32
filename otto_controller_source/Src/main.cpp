@@ -56,6 +56,8 @@ DMA_HandleTypeDef hdma_usart3_tx;
 /* USER CODE BEGIN PV */
 
 Encoder left_encoder = Encoder(&htim2);
+float velocity = 0;
+int tick = 0;
 float meters = 0;
 
 /* USER CODE END PV */
@@ -122,9 +124,11 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    meters += left_encoder.GetCount();
-    left_encoder.ResetCount();
-    HAL_Delay(100);
+    //velocity = left_encoder.GetLinearVelocity();
+    //tick = left_encoder.GetCount();
+    //meters = left_encoder.GetMeters();
+    //left_encoder.ResetCount();
+    //HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -493,7 +497,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
   if (htim->Instance == TIM3){
-    float left_meters = left_encoder.GetMeters();
+    velocity = left_encoder.GetLinearVelocity();
   }
 
 }

@@ -14,21 +14,23 @@ void Encoder::Setup() {
 void Encoder::UpdateValues() {
   this->previous_millis = this->current_millis;
   this->current_millis = HAL_GetTick();
-  this->ticks = this->GetCount() - 2147483648;
+  this->ticks = this->GetCount();
   this->ResetCount();
 }
 
-float Encoder::GetMeters() {
-  uint32_t ticks = this->GetCount();
-  float meters = ((float) ticks * kWheelCircumference) / kTicksPerRevolution;
-  this->ResetCount();
+float Encoder::GetMeters(){
+  this->UpdateValues();
+  float meters = ((float) this->ticks * kWheelCircumference)
+      / kTicksPerRevolution;
   return meters;
 }
 
 float Encoder::GetLinearVelocity() {
-  float meters = this->GetMeters();
-  float linear_velocity = meters
-      / ((this->current_millis - previous_millis) / 1000);
+  this->UpdateValues();
+  float meters = ((float) this->ticks * kWheelCircumference)
+      / kTicksPerRevolution;
+  float deltaTime = this->current_millis - this->previous_millis;
+  float linear_velocity = (meters / (deltaTime / 1000));
   return linear_velocity;
 }
 
