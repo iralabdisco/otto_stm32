@@ -19,6 +19,7 @@
 "Src/duration.o"
 "Src/encoder.o"
 "Src/main.o"
+"Src/odometry_calc.o"
 "Src/stm32f7xx_hal_msp.o"
 "Src/stm32f7xx_it.o"
 "Src/syscalls.o"

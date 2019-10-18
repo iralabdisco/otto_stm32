@@ -6,9 +6,9 @@
 class Encoder {
  public:
   TIM_HandleTypeDef* timer_;
-  uint32_t previous_millis;
-  uint32_t current_millis;
-  int32_t ticks; //if negative the wheel is going backwards
+  uint32_t previous_millis_;
+  uint32_t current_millis_;
+  int32_t ticks_; //if negative the wheel is going backwards
 
   uint32_t kTicksPerRevolution = 74000; //x2 resolution
   float kPi = 3.14159;

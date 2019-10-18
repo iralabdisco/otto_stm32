@@ -59,6 +59,7 @@ Encoder left_encoder = Encoder(&htim2);
 float velocity = 0;
 int tick = 0;
 float meters = 0;
+int ciao = 0;
 
 /* USER CODE END PV */
 
@@ -119,6 +120,7 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim3);
   left_encoder.Setup();
 
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -128,7 +130,8 @@ int main(void)
     //tick = left_encoder.GetCount();
     //meters = left_encoder.GetMeters();
     //left_encoder.ResetCount();
-    //HAL_Delay(1000);
+    ciao++;
+    HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -498,8 +501,8 @@ static void MX_GPIO_Init(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
   if (htim->Instance == TIM3){
     velocity = left_encoder.GetLinearVelocity();
+    ciao++;
   }
-
 }
 
 /* USER CODE END 4 */
