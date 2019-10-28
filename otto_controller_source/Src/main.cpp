@@ -64,9 +64,6 @@ float delta_l = 0;
 float velocity_l = 0;
 float velocity_r = 0;
 
-int tick = 0;
-float meters = 0;
-int ciao = 0;
 
 /* USER CODE END PV */
 
@@ -508,7 +505,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 
     delta_r = right_encoder.current_millis_ - right_encoder.previous_millis_;
     delta_l = left_encoder.current_millis_ - left_encoder.previous_millis_;
-    ciao++;
   }
 }
 

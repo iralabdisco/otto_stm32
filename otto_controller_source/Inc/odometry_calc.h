@@ -8,14 +8,14 @@ class OdometryCalc{
   public:
     Encoder left_encoder_;
     Encoder right_encoder_;
-    float theta;
+    float theta_;
     nav_msgs::Odometry odometry_;
     float kBaseline;
 
   OdometryCalc(){
     left_encoder_ = NULL;
     right_encoder_ = NULL;
-    theta = 0;
+    theta_ = 0;
 
     // odometry_.pose.covariance = 0.0;
     odometry_.pose.pose.position.x = 0.0;
@@ -27,9 +27,10 @@ class OdometryCalc{
     odometry_.pose.pose.orientation.y = 0.0;
     odometry_.pose.pose.orientation.z = 0.0;
     odometry_.pose.pose.orientation.w = 0.0;
+
     //odometry_.twist.covariance = 0.0;
-    odometry_.twist.twist.angular; //TODO
-    odometry_.twist.twist.linear; //TODO
+    odometry_.twist.twist.angular.z = 0;
+    odometry_.twist.twist.linear.x = 0;
 
     kBaseline = 0.35; //in meters
   }
