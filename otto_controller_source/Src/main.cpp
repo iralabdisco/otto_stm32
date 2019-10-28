@@ -56,7 +56,14 @@ DMA_HandleTypeDef hdma_usart3_tx;
 /* USER CODE BEGIN PV */
 
 Encoder left_encoder = Encoder(&htim2);
-float velocity = 0;
+Encoder right_encoder = Encoder(&htim5);
+
+float delta_r = 0;
+float delta_l = 0;
+
+float velocity_l = 0;
+float velocity_r = 0;
+
 int tick = 0;
 float meters = 0;
 int ciao = 0;
@@ -119,6 +126,7 @@ int main(void)
 
   HAL_TIM_Base_Start_IT(&htim3);
   left_encoder.Setup();
+  right_encoder.Setup();
 
 
   /* USER CODE END 2 */
@@ -126,12 +134,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    //velocity = left_encoder.GetLinearVelocity();
-    //tick = left_encoder.GetCount();
-    //meters = left_encoder.GetMeters();
-    //left_encoder.ResetCount();
-    ciao++;
-    HAL_Delay(1000);
+    //HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -500,7 +503,11 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
   if (htim->Instance == TIM3){
-    velocity = left_encoder.GetLinearVelocity();
+    velocity_l = left_encoder.GetLinearVelocity();
+    velocity_r = right_encoder.GetLinearVelocity();
+
+    delta_r = right_encoder.current_millis_ - right_encoder.previous_millis_;
+    delta_l = left_encoder.current_millis_ - left_encoder.previous_millis_;
     ciao++;
   }
 }
