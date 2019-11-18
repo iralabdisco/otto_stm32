@@ -16,7 +16,11 @@ void OdometryCalc::OdometryUpdateMessage(){
 
   // calcoli vari
   float linear_velocity = (left_velocity + right_velocity) / 2;
-  float angular_velocity = (right_velocity - left_velocity) / kBaseline;
+  float angular_velocity;
+  if (right_velocity - left_velocity == 0)
+    angular_velocity = 0;
+  else
+    angular_velocity = (right_velocity - left_velocity) / kBaseline;
   float diff = angular_velocity / delta_time;
   float r = (kBaseline / 2) * ((right_velocity + left_velocity) /
       (right_velocity - left_velocity));
