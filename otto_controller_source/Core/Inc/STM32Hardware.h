@@ -38,7 +38,7 @@
 #include "stm32f7xx_hal.h"
 #include "stm32f7xx_hal_uart.h"
 
-extern UART_HandleTypeDef huart3;
+extern UART_HandleTypeDef huart6;
 
 class STM32Hardware {
   protected:
@@ -55,7 +55,7 @@ class STM32Hardware {
 
   public:
     STM32Hardware():
-      huart(&huart3), rind(0), twind(0), tfind(0){
+      huart(&huart6), rind(0), twind(0), tfind(0){
     }
 
     STM32Hardware(UART_HandleTypeDef *huart_):
