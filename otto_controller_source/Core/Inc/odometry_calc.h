@@ -1,8 +1,14 @@
 #ifndef ODOMETRY_CALC_H
 #define ODOMETRY_CALC_H
 
+#include <nav_msgs/Odometry.h>
+#include <tf/tf.h>
+#include <geometry_msgs/Quaternion.h>
+#include <cmath>
+
+#include "main.h"
 #include "encoder.h"
-#include "nav_msgs/Odometry.h"
+
 
 class OdometryCalc{
   public:

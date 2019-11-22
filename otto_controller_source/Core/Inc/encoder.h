@@ -23,7 +23,8 @@ class Encoder {
   void Setup();
 
   int GetCount() {
-    int count = ((int)__HAL_TIM_GET_COUNTER(timer_) - ((timer_->Init.Period)/2));
+    int count = ((int)__HAL_TIM_GET_COUNTER(this->timer_) -
+    		((this->timer_->Init.Period)/2));
     return count;
   }
 

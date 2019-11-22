@@ -1,7 +1,4 @@
 #include "odometry_calc.h"
-#include <tf/tf.h>
-#include <geometry_msgs/Quaternion.h>
-#include <cmath>
 
 void OdometryCalc::OdometryUpdateMessage(){
   float left_velocity = left_encoder_.GetLinearVelocity();

@@ -1,8 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    stm32f7xx_it.h
-  * @brief   This file contains the headers of the interrupt handlers.
+  * @file           : main.h
+  * @brief          : Header for main.c file.
+  *                   This file contains the common defines of the application.
   ******************************************************************************
   * @attention
   *
@@ -14,17 +15,20 @@
   * License. You may obtain a copy of the License at:
   *                        opensource.org/licenses/BSD-3-Clause
   *
- ******************************************************************************
+  ******************************************************************************
   */
 /* USER CODE END Header */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F7xx_IT_H
-#define __STM32F7xx_IT_H
+#ifndef __MAIN_H
+#define __MAIN_H
 
 #ifdef __cplusplus
- extern "C" {
-#endif 
+extern "C" {
+#endif
+
+/* Includes ------------------------------------------------------------------*/
+#include "stm32f7xx_hal.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -46,30 +50,40 @@
 
 /* USER CODE END EM */
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
 /* Exported functions prototypes ---------------------------------------------*/
-void NMI_Handler(void);
-void HardFault_Handler(void);
-void MemManage_Handler(void);
-void BusFault_Handler(void);
-void UsageFault_Handler(void);
-void SVC_Handler(void);
-void DebugMon_Handler(void);
-void PendSV_Handler(void);
-void SysTick_Handler(void);
-void DMA1_Stream1_IRQHandler(void);
-void DMA1_Stream3_IRQHandler(void);
-void TIM3_IRQHandler(void);
-void USART3_IRQHandler(void);
-void DMA2_Stream1_IRQHandler(void);
-void DMA2_Stream6_IRQHandler(void);
+void Error_Handler(void);
+
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
+
+/* Private defines -----------------------------------------------------------*/
+#define current1_Pin GPIO_PIN_3
+#define current1_GPIO_Port GPIOA
+#define fault2_Pin GPIO_PIN_6
+#define fault2_GPIO_Port GPIOA
+#define dir1_Pin GPIO_PIN_13
+#define dir1_GPIO_Port GPIOF
+#define sleep2_Pin GPIO_PIN_14
+#define sleep2_GPIO_Port GPIOF
+#define sleep1_Pin GPIO_PIN_15
+#define sleep1_GPIO_Port GPIOF
+#define fault1_Pin GPIO_PIN_9
+#define fault1_GPIO_Port GPIOE
+#define pwm2_Pin GPIO_PIN_14
+#define pwm2_GPIO_Port GPIOD
+#define pwm1_Pin GPIO_PIN_15
+#define pwm1_GPIO_Port GPIOD
+/* USER CODE BEGIN Private defines */
+
+/* USER CODE END Private defines */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __STM32F7xx_IT_H */
+#endif /* __MAIN_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
