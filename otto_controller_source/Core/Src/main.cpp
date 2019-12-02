@@ -23,17 +23,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <string>
-
-#include <std_msgs/String.h>
-#include <ros.h>
-#include <tf/transform_broadcaster.h>
-#include <geometry_msgs/TransformStamped.h>
 
 #include <encoder.h>
 #include <odometry_calc.h>
-#include <nav_msgs/Odometry.h>
-#include <sensor_msgs/Imu.h>
 
 /* USER CODE END Includes */
 
@@ -77,19 +69,6 @@ float delta_r = 0;
 float delta_l = 0;
 float velocity_l = 0;
 float velocity_r = 0;
-
-//ROS stuff
-ros::NodeHandle nh;
-std_msgs::String str_msg;
-ros::Publisher chatter("chatter", &str_msg);
-char hello[] = "Hello world!";
-
-nav_msgs::Odometry odometry;
-sensor_msgs::Imu imu;
-ros::Publisher odom_pub("odom", &imu);
-
-tf::TransformBroadcaster br;
-geometry_msgs::TransformStamped odom_trans;
 
 /* USER CODE END PV */
 
@@ -148,12 +127,6 @@ int main(void) {
 	MX_USART6_UART_Init();
 	/* USER CODE BEGIN 2 */
 
-	nh.initNode();
-	nh.advertise(chatter);
-	nh.advertise(odom_pub);
-	br.init(nh);
-	str_msg.data = hello;
-
 	left_encoder.Setup();
 	right_encoder.Setup();
 
@@ -166,25 +139,6 @@ int main(void) {
 	while (1) {
 		velocity_l = left_encoder.GetCount();
 		velocity_r = right_encoder.GetCount();
-
-		//odom.OdometryUpdateMessage();
-		//odom.odometry_.header.stamp = nh.now();
-
-		//odometry = odom.odometry_;
-		odom_pub.publish(&imu);
-
-		chatter.publish(&str_msg);
-
-		odom_trans.header.stamp = nh.now();
-		odom_trans.header.frame_id = "odom";
-		odom_trans.child_frame_id = "base_link";
-		odom_trans.transform.translation.x = odometry.pose.pose.position.x;
-		odom_trans.transform.translation.y = odometry.pose.pose.position.x;
-		odom_trans.transform.translation.z = 0;
-		odom_trans.transform.rotation = odometry.pose.pose.orientation;
-		br.sendTransform(odom_trans);
-
-		nh.spinOnce();
 
 		HAL_Delay(1000);
 
@@ -591,23 +545,8 @@ static void MX_GPIO_Init(void) {
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM3) {
 
-		odom.OdometryUpdateMessage();
-		odometry = odom.odometry_;
-		odom_pub.publish(&odometry);
-
-//		chatter.publish(&str_msg);
-		nh.spinOnce();
-
 	}
 }
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
-	nh.getHardware()->flush();
-}
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-	nh.getHardware()->reset_rbuf();
-}
-
 /* USER CODE END 4 */
 
 /**
