@@ -1,9 +1,12 @@
 import serial, struct
-ser = serial.Serial('/dev/ttyUSB0')
-buffer = ser.read(12)
-angular_vel = struct.unpack('f', buffer[0:4])
-linear_vel = struct.unpack('f', buffer[4:8])
-delta_time = struct.unpack('f', buffer[8:12])
-print(angular_vel)
-print(linear_vel)
-print(delta_time)
+ser = serial.Serial(
+	port='/dev/ttyUSB0',
+        baudrate=115200,
+        parity=serial.PARITY_ODD,
+        stopbits=serial.STOPBITS_TWO,
+        bytesize=serial.EIGHTBITS,
+        rtscts=True)
+while 1:
+	buffer = ser.read(12)
+	msg_received = struct.unpack('fff', buffer)
+	print(msg_received)
