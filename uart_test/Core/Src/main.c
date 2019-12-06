@@ -23,6 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "communication_utils.h"
 
 /* USER CODE END Includes */
 
@@ -42,6 +43,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 
+TIM_HandleTypeDef htim3;
+
 UART_HandleTypeDef huart6;
 
 /* USER CODE BEGIN PV */
@@ -52,6 +55,7 @@ UART_HandleTypeDef huart6;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART6_UART_Init(void);
+static void MX_TIM3_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -59,6 +63,14 @@ static void MX_USART6_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+// COMMUNICATION STUFF
+
+uint8_t *out_buffer;
+uint8_t *in_buffer;
+
+odometry_msg odom_msg;
+velocity_msg vel_msg;
+int test = 0;
 /* USER CODE END 0 */
 
 /**
@@ -91,40 +103,30 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART6_UART_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  char hello[] = "Hello world! \n";
 
-  typedef struct {
-    float angular_velocity;
-    float linear_velocity;
-    float delta_time;
-  } odometry_msg;
+  odom_msg.angular_velocity = 0.2;
+  odom_msg.linear_velocity = 1.5;
+  odom_msg.delta_time = 2.6;
 
-  float odometry_values[3];
+  out_buffer = (uint8_t *) &odom_msg;
+  in_buffer = (uint8_t*) &vel_msg;
 
-  odometry_values[0] = 0.5;
-  odometry_values[1] = 1.5;
-  odometry_values[2] = 9.5;
 
-  odometry_msg out_msg;
-  out_msg.angular_velocity = 0.2;
-  out_msg.linear_velocity = 1.5;
-  out_msg.delta_time = 2.6;
-  uint8_t *buffer = &out_msg;
+//  HAL_TIM_Base_Start_IT(&htim3);
+  HAL_UART_Receive_IT(&huart6, in_buffer, 8);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-    HAL_UART_Transmit(&huart6, buffer, 12, 100);
-    out_msg.angular_velocity++;
-    out_msg.linear_velocity++;
-    out_msg.delta_time++;
 
-    //HAL_UART_Transmit(&huart6, (uint8_t)* hello, 15, 100);
+//    HAL_UART_Transmit(&huart6, out_buffer, 12, 100);
 
-    HAL_Delay(100);
+//    HAL_Delay(100);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -178,6 +180,51 @@ void SystemClock_Config(void)
 }
 
 /**
+  * @brief TIM3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM3_Init(void)
+{
+
+  /* USER CODE BEGIN TIM3_Init 0 */
+
+  /* USER CODE END TIM3_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM3_Init 1 */
+
+  /* USER CODE END TIM3_Init 1 */
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = 39999;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = 9;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM3_Init 2 */
+
+  /* USER CODE END TIM3_Init 2 */
+
+}
+
+/**
   * @brief USART6 Initialization Function
   * @param None
   * @retval None
@@ -195,10 +242,10 @@ static void MX_USART6_UART_Init(void)
   huart6.Instance = USART6;
   huart6.Init.BaudRate = 115200;
   huart6.Init.WordLength = UART_WORDLENGTH_9B;
-  huart6.Init.StopBits = UART_STOPBITS_2;
+  huart6.Init.StopBits = UART_STOPBITS_1;
   huart6.Init.Parity = UART_PARITY_ODD;
   huart6.Init.Mode = UART_MODE_TX_RX;
-  huart6.Init.HwFlowCtl = UART_HWCONTROL_RTS_CTS;
+  huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart6.Init.OverSampling = UART_OVERSAMPLING_16;
   huart6.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
   huart6.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
@@ -221,12 +268,25 @@ static void MX_GPIO_Init(void)
 {
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
 
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+  if (htim->Instance == TIM3) {
+    HAL_UART_Transmit(&huart6, out_buffer, 12, 100);
+  }
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
+  test++;
+  HAL_UART_Receive_IT(&huart6, out_buffer, 8);
+}
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle){
+  test = 9;
+}
 
 /* USER CODE END 4 */
 
