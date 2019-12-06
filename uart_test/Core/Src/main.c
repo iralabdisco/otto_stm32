@@ -65,8 +65,8 @@ static void MX_TIM3_Init(void);
 
 // COMMUNICATION STUFF
 
-uint8_t *out_buffer;
-uint8_t *in_buffer;
+uint8_t *tx_buffer;
+uint8_t *rx_buffer;
 
 odometry_msg odom_msg;
 velocity_msg vel_msg;
@@ -111,22 +111,18 @@ int main(void)
   odom_msg.linear_velocity = 1.5;
   odom_msg.delta_time = 2.6;
 
-  out_buffer = (uint8_t *) &odom_msg;
-  in_buffer = (uint8_t*) &vel_msg;
+  tx_buffer = (uint8_t *) &odom_msg;
+  rx_buffer = (uint8_t*) &vel_msg;
 
+  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
 
-//  HAL_TIM_Base_Start_IT(&htim3);
-  HAL_UART_Receive_IT(&huart6, in_buffer, 8);
+  HAL_TIM_Base_Start_IT(&htim3);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-
-//    HAL_UART_Transmit(&huart6, out_buffer, 12, 100);
-
-//    HAL_Delay(100);
 
     /* USER CODE END WHILE */
 
@@ -277,13 +273,12 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   if (htim->Instance == TIM3) {
-    HAL_UART_Transmit(&huart6, out_buffer, 12, 100);
+    HAL_UART_Transmit(&huart6, tx_buffer, 12, 100);
   }
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
-  test++;
-  HAL_UART_Receive_IT(&huart6, in_buffer, 8);
+  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle){
