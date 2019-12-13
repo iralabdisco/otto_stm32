@@ -60,10 +60,20 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define current2_Pin GPIO_PIN_0
+#define current2_GPIO_Port GPIOC
+#define encoder_sx1_Pin GPIO_PIN_0
+#define encoder_sx1_GPIO_Port GPIOA
+#define encoder_sx2_Pin GPIO_PIN_1
+#define encoder_sx2_GPIO_Port GPIOA
 #define current1_Pin GPIO_PIN_3
 #define current1_GPIO_Port GPIOA
+#define encoder_dx1_Pin GPIO_PIN_5
+#define encoder_dx1_GPIO_Port GPIOA
 #define fault2_Pin GPIO_PIN_6
 #define fault2_GPIO_Port GPIOA
+#define dir2_Pin GPIO_PIN_12
+#define dir2_GPIO_Port GPIOF
 #define dir1_Pin GPIO_PIN_13
 #define dir1_GPIO_Port GPIOF
 #define sleep2_Pin GPIO_PIN_14
@@ -76,6 +86,8 @@ void Error_Handler(void);
 #define pwm2_GPIO_Port GPIOD
 #define pwm1_Pin GPIO_PIN_15
 #define pwm1_GPIO_Port GPIOD
+#define encoder_dx2_Pin GPIO_PIN_3
+#define encoder_dx2_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
