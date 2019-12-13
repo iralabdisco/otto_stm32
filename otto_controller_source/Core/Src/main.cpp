@@ -23,12 +23,9 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <std_msgs/String.h>
-#include <ros.h>
 
 #include <encoder.h>
 #include <odometry_calc.h>
-#include <nav_msgs/Odometry.h>
 
 /* USER CODE END Includes */
 
@@ -63,24 +60,15 @@ DMA_HandleTypeDef hdma_usart6_tx;
 /* USER CODE BEGIN PV */
 
 //Odometry
-Encoder left_encoder = Encoder(&htim2);
-Encoder right_encoder = Encoder(&htim5);
+Encoder left_encoder = Encoder(&htim5);
+Encoder right_encoder = Encoder(&htim2);
 OdometryCalc odom = OdometryCalc(left_encoder, right_encoder);
-
 //test stuff
+
 float delta_r = 0;
 float delta_l = 0;
 float velocity_l = 0;
 float velocity_r = 0;
-
-//ROS stuff
-ros::NodeHandle nh;
-std_msgs::String str_msg;
-ros::Publisher chatter("chatter", &str_msg);
-char hello[] = "Hello world!";
-
-nav_msgs::Odometry odometry;
-ros::Publisher odom_pub("odom_pub", &odometry);
 
 /* USER CODE END PV */
 
@@ -139,17 +127,8 @@ int main(void) {
 	MX_USART6_UART_Init();
 	/* USER CODE BEGIN 2 */
 
-	nh.initNode();
-	nh.advertise(chatter);
-	nh.advertise(odom_pub);
-	str_msg.data = hello;
-
 	left_encoder.Setup();
 	right_encoder.Setup();
-
-	//TODO sistemare il costruttore di odom, non dovrei fare io questa cosa a mano
-	odom.right_encoder_ = right_encoder;
-	odom.left_encoder_ = left_encoder;
 
 //	HAL_TIM_Base_Start_IT(&htim3);
 
@@ -158,9 +137,11 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		odom.OdometryUpdateMessage();
-		odometry = odom.odometry_;
-		odom_pub.publish(&odometry);
+		velocity_l = left_encoder.GetCount();
+		velocity_r = right_encoder.GetCount();
+
+		HAL_Delay(1000);
+
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
@@ -563,28 +544,9 @@ static void MX_GPIO_Init(void) {
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM3) {
-		velocity_l = left_encoder.GetLinearVelocity();
-		velocity_r = right_encoder.GetLinearVelocity();
-//    delta_r = right_encoder.current_millis_ - right_encoder.previous_millis_;
-//    delta_l = left_encoder.current_millis_ - left_encoder.previous_millis_;
-
-//    odom.OdometryUpdateMessage();
-//    odometry = odom.odometry_;
-//    odom_pub.publish(&odometry);
-
-		chatter.publish(&str_msg);
-		nh.spinOnce();
 
 	}
 }
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
-	nh.getHardware()->flush();
-}
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-	nh.getHardware()->reset_rbuf();
-}
-
 /* USER CODE END 4 */
 
 /**
