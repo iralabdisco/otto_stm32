@@ -28,6 +28,7 @@
 #include "odometry.h"
 #include "motor_controller.h"
 #include "pid.h"
+#include "communication_utils.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,12 +63,26 @@ DMA_HandleTypeDef hdma_usart6_tx;
 Encoder left_encoder = Encoder(&htim5);
 Encoder right_encoder = Encoder(&htim2);
 Odometry odom = Odometry(left_encoder, right_encoder);
-//test stuff
+float baseline = 0.3;
 
-float delta_r = 0;
-float delta_l = 0;
-float velocity_l = 0;
-float velocity_r = 0;
+//PID
+
+Pid left_pid(0.5, 0.2, 0.1, 1, 790);
+Pid right_pid(0.5, 0.2, 0.1, 1, 790);
+Pid cross_pid(0.5, 0.2, 0.1, 1, 790);
+
+//MotorController
+MotorController left_motor(sleep1_GPIO_Port, sleep1_Pin, dir1_GPIO_Port,
+		dir1_Pin, &htim4, TIM_CHANNEL_4);
+MotorController right_motor(sleep2_GPIO_Port, sleep2_Pin, dir2_GPIO_Port,
+		dir2_Pin, &htim4, TIM_CHANNEL_3);
+
+//Communication
+uint8_t *tx_buffer;
+uint8_t *rx_buffer;
+
+odometry_msg odom_msg;
+velocity_msg vel_msg;
 
 /* USER CODE END PV */
 
@@ -129,13 +144,8 @@ int main(void) {
 	left_encoder.Setup();
 	right_encoder.Setup();
 
-	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_4);
-	HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_3);
-
-	HAL_GPIO_WritePin(dir1_GPIO_Port, dir1_Pin, GPIO_PIN_SET);
-
-	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_4, 790);
-	__HAL_TIM_SET_COMPARE(&htim4, TIM_CHANNEL_3, 750);
+	tx_buffer = (uint8_t*) &odom_msg;
+	rx_buffer = (uint8_t*) &vel_msg;
 
 	HAL_TIM_Base_Start_IT(&htim3);
 
@@ -531,7 +541,34 @@ static void MX_GPIO_Init(void) {
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim->Instance == TIM3) {
 
+		//PID control
+		float left_measure = left_encoder.GetLinearVelocity();
+		float right_measure = right_encoder.GetLinearVelocity();
+		int left_duty_cycle = left_pid.update(left_measure);
+		int right_duty_cycle = right_pid.update(right_measure);
+
+		left_motor.set_speed(left_duty_cycle);
+		right_motor.set_speed(right_duty_cycle);
 	}
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
+
+	float left_setpoint;
+	float right_setpoint;
+
+	left_setpoint = -(vel_msg.angular_velocity * baseline)
+			+ vel_msg.linear_velocity;
+	right_setpoint = vel_msg.linear_velocity * 2 - left_setpoint;
+
+	left_pid.set(left_setpoint);
+	right_pid.set(right_setpoint);
+
+	//TODO cross pid
+
+	//abilita interrupt nuovamente
+	HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
+
 }
 /* USER CODE END 4 */
 
