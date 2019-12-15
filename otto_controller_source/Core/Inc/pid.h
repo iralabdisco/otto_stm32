@@ -2,21 +2,21 @@
 #define PID_H
 
 class Pid {
-public:
-	float kp_;
-	float ki_;
-	float kd_;
-	float previous_error_;
-	float error_;
-	float error_sum_;
-	float setpoint_;
-	int min_;
-	int max_;
+ public:
+  float kp_;
+  float ki_;
+  float kd_;
+  float previous_error_;
+  float error_;
+  float error_sum_;
+  float setpoint_;
+  int min_;
+  int max_;
 
-	Pid(float kp, float ki, float kd, int min, int max){
-		this->kp_ = kp;
-		this->ki_ = ki;
-		this->kd_ = kd;
+  Pid(float kp, float ki, float kd, int min, int max) {
+    this->kp_ = kp;
+    this->ki_ = ki;
+    this->kd_ = kd;
 		this->previous_error_ = 0;
 		this->error_ = 0;
 		this->error_sum_ = 0;
@@ -30,6 +30,8 @@ public:
 	}
 
 	int update(float measure){
+
+	  //TODO si rompono i numeri negativi, da fixare
 
 		this->error_ = this->setpoint_ - measure;
 

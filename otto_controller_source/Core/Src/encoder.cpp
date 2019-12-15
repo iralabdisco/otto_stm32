@@ -1,6 +1,6 @@
 #include "encoder.h"
 
-Encoder::Encoder(TIM_HandleTypeDef* timer) {
+Encoder::Encoder(TIM_HandleTypeDef *timer) {
   timer_ = timer;
 }
 
@@ -18,7 +18,7 @@ void Encoder::UpdateValues() {
   this->ResetCount();
 }
 
-float Encoder::GetMeters(){
+float Encoder::GetMeters() {
   this->UpdateValues();
   float meters = ((float) this->ticks_ * kWheelCircumference)
       / kTicksPerRevolution;

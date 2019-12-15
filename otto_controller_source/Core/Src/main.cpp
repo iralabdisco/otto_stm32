@@ -54,8 +54,6 @@ TIM_HandleTypeDef htim5;
 TIM_HandleTypeDef htim6;
 
 UART_HandleTypeDef huart6;
-DMA_HandleTypeDef hdma_usart6_rx;
-DMA_HandleTypeDef hdma_usart6_tx;
 
 /* USER CODE BEGIN PV */
 
@@ -71,11 +69,21 @@ Pid left_pid(0.5, 0.2, 0.1, 1, 790);
 Pid right_pid(0.5, 0.2, 0.1, 1, 790);
 Pid cross_pid(0.5, 0.2, 0.1, 1, 790);
 
+int left_dutycycle;
+int right_dutycycle;
+
 //MotorController
-MotorController left_motor(sleep1_GPIO_Port, sleep1_Pin, dir1_GPIO_Port,
-		dir1_Pin, &htim4, TIM_CHANNEL_4);
-MotorController right_motor(sleep2_GPIO_Port, sleep2_Pin, dir2_GPIO_Port,
-		dir2_Pin, &htim4, TIM_CHANNEL_3);
+MotorController left_motor(sleep1_GPIO_Port,
+                           sleep1_Pin,
+                           dir1_GPIO_Port,
+                           dir1_Pin,
+                           &htim4,
+                           TIM_CHANNEL_4);
+MotorController right_motor(sleep2_GPIO_Port,
+                            sleep2_Pin, dir2_GPIO_Port,
+                            dir2_Pin,
+                            &htim4,
+                            TIM_CHANNEL_3);
 
 //Communication
 uint8_t *tx_buffer;
@@ -89,7 +97,6 @@ velocity_msg vel_msg;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_DMA_Init(void);
 static void MX_TIM2_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM4_Init(void);
@@ -113,7 +120,6 @@ static void MX_NVIC_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
   
 
@@ -135,7 +141,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_DMA_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
@@ -147,23 +152,24 @@ int main(void)
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
 
-	left_encoder.Setup();
-	right_encoder.Setup();
+  left_encoder.Setup();
+  right_encoder.Setup();
 
-	tx_buffer = (uint8_t*) &odom_msg;
-	rx_buffer = (uint8_t*) &vel_msg;
+  tx_buffer = (uint8_t*) &odom_msg;
+  rx_buffer = (uint8_t*) &vel_msg;
 
-	HAL_TIM_Base_Start_IT(&htim3);
+  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
+  HAL_TIM_Base_Start_IT(&htim3);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	while (1) {
+  while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	}
+  }
   /* USER CODE END 3 */
 }
 
@@ -224,12 +230,6 @@ static void MX_NVIC_Init(void)
   /* TIM6_DAC_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 2, 2);
   HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
-  /* DMA2_Stream1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 2, 0);
-  HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
-  /* DMA2_Stream6_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream6_IRQn, 2, 0);
-  HAL_NVIC_EnableIRQ(DMA2_Stream6_IRQn);
   /* USART6_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(USART6_IRQn, 2, 0);
   HAL_NVIC_EnableIRQ(USART6_IRQn);
@@ -496,9 +496,9 @@ static void MX_USART6_UART_Init(void)
   /* USER CODE END USART6_Init 1 */
   huart6.Instance = USART6;
   huart6.Init.BaudRate = 115200;
-  huart6.Init.WordLength = UART_WORDLENGTH_8B;
+  huart6.Init.WordLength = UART_WORDLENGTH_9B;
   huart6.Init.StopBits = UART_STOPBITS_1;
-  huart6.Init.Parity = UART_PARITY_NONE;
+  huart6.Init.Parity = UART_PARITY_ODD;
   huart6.Init.Mode = UART_MODE_TX_RX;
   huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart6.Init.OverSampling = UART_OVERSAMPLING_16;
@@ -511,17 +511,6 @@ static void MX_USART6_UART_Init(void)
   /* USER CODE BEGIN USART6_Init 2 */
 
   /* USER CODE END USART6_Init 2 */
-
-}
-
-/** 
-  * Enable DMA controller clock
-  */
-static void MX_DMA_Init(void) 
-{
-
-  /* DMA controller clock enable */
-  __HAL_RCC_DMA2_CLK_ENABLE();
 
 }
 
@@ -580,35 +569,35 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
-	if (htim->Instance == TIM3) {
+  if (htim->Instance == TIM3) {
 
-		//PID control
-		float left_measure = left_encoder.GetLinearVelocity();
-		float right_measure = right_encoder.GetLinearVelocity();
-		int left_duty_cycle = left_pid.update(left_measure);
-		int right_duty_cycle = right_pid.update(right_measure);
+    //PID control
 
-		left_motor.set_speed(left_duty_cycle);
-		right_motor.set_speed(right_duty_cycle);
-	}
+    float left_measure = left_encoder.GetLinearVelocity();
+    float right_measure = right_encoder.GetLinearVelocity();
+    left_dutycycle = left_pid.update(left_measure);
+    right_dutycycle = right_pid.update(right_measure);
+
+    left_motor.set_speed(left_dutycycle);
+    right_motor.set_speed(right_dutycycle);
+  }
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
+  float left_setpoint;
+  float right_setpoint;
 
-	float left_setpoint;
-	float right_setpoint;
+  left_setpoint = -(vel_msg.angular_velocity * baseline)
+      + vel_msg.linear_velocity;
+  right_setpoint = vel_msg.linear_velocity * 2 - left_setpoint;
 
-	left_setpoint = -(vel_msg.angular_velocity * baseline)
-			+ vel_msg.linear_velocity;
-	right_setpoint = vel_msg.linear_velocity * 2 - left_setpoint;
+  left_pid.set(left_setpoint);
+  right_pid.set(right_setpoint);
 
-	left_pid.set(left_setpoint);
-	right_pid.set(right_setpoint);
+  //TODO cross pid
 
-	//TODO cross pid
-
-	//abilita interrupt nuovamente
-	HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
+  //abilita interrupt nuovamente
+  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
 
 }
 /* USER CODE END 4 */
@@ -620,7 +609,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-	/* User can add his own implementation to report the HAL error return state */
+  /* User can add his own implementation to report the HAL error return state */
 
   /* USER CODE END Error_Handler_Debug */
 }
