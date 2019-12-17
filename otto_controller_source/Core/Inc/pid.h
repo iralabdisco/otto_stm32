@@ -50,7 +50,6 @@ class Pid {
     float output = this->error_ * this->kp_;
 
     //integral term
-
     if (this->error_sum_index_ == 10) {
       this->error_sum_array_[0] = this->error_;
       this->error_sum_index_ = 0;
@@ -67,7 +66,9 @@ class Pid {
 
     output += error_sum * this->ki_;
 
-    //TODO derivative term
+    //derivative term
+    output += (this->error_ - this->previous_error_);
+    this->previous_error_ = this->error_;
 
     int integer_output = (int) output;
 
