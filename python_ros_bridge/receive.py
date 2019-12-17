@@ -9,8 +9,8 @@ ser = serial.Serial(
 
 while 1:
 	ser.reset_input_buffer()
-	buffer = ser.read(12)
-	msg_received = struct.unpack('<fff', buffer)
+	buffer = ser.read(8)
+	msg_received = struct.unpack('<ff', buffer)
 	print(msg_received)
 	print(buffer)
 

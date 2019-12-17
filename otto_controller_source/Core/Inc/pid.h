@@ -3,62 +3,76 @@
 
 class Pid {
  public:
+  //PID constants
   float kp_;
   float ki_;
   float kd_;
-  float previous_error_;
-  float error_;
-  float error_sum_;
-  float setpoint_;
-  int min_;
-  int max_;
 
-  Pid(float kp, float ki, float kd, int min, int max) {
+  float error_;
+  float setpoint_;
+
+  //needed for integral term
+  float error_sum_array_[10];
+  int error_sum_index_;
+
+  //needed for derivative term
+  float previous_error_;
+
+//  int min_;
+//  int max_;
+
+  Pid(float kp, float ki, float kd) {
     this->kp_ = kp;
     this->ki_ = ki;
     this->kd_ = kd;
-		this->previous_error_ = 0;
-		this->error_ = 0;
-		this->error_sum_ = 0;
-		this->setpoint_ = 0;
-		this->min_ = min;
-		this->max_ = max;
-	}
 
-	void set(float setpoint){
-		this->setpoint_ = setpoint;
-	}
+    this->error_ = 0;
+    this->setpoint_ = 0;
 
-	int update(float measure){
+    this->previous_error_ = 0;
+    this->error_sum_index_ = 0;
 
-	  //TODO si rompono i numeri negativi, da fixare
+    for (int i = 0; i < 10; i++) {
+      this->error_sum_array_[i] = 0;
+    }
 
-		this->error_ = this->setpoint_ - measure;
+  }
 
-		//proportional term
-		float output = this->error_ * this->kp_;
+  void set(float setpoint) {
+    this->setpoint_ = setpoint;
+  }
 
-		//TODO integral term
+  int update(float measure) {
 
-		//TODO derivative term
+    this->error_ = this->setpoint_ - measure;
 
-		if (output > this->max_){
+    //proportional term
+    float output = this->error_ * this->kp_;
 
-			output = this->max_;
+    //integral term
 
-			//TODO anti-windup (prima capisco cos'è)
+    if (this->error_sum_index_ == 10) {
+      this->error_sum_array_[0] = this->error_;
+      this->error_sum_index_ = 0;
+    } else {
+      this->error_sum_array_[this->error_sum_index_] = this->error_;
+      this->error_sum_index_++;
+    }
 
-		} else if (output < this->min_){
+    float error_sum = 0;
+    for (int i = 0; i < 10; i++) {
+      error_sum += this->error_sum_array_[i];
+    }
 
-			output = this->min_;
 
-			//TODO anti-windup
-		}
+    output += error_sum * this->ki_;
 
-		int integer_output = (int) output;
+    //TODO derivative term
 
-		return integer_output;
+    int integer_output = (int) output;
 
-	}
+    return integer_output;
+
+  }
 };
 #endif
