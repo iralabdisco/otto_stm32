@@ -11,11 +11,14 @@ ser = serial.Serial(
 
 def signal_handler(sig, frame):
 	print('Logging stopped')
+	print('Info logged on ' + file_name)
 	log_file.close()
 	sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
-file_name = datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv"
+user_input = input("Enter file name: ")
+
+file_name = user_input + "-" +  datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv"
 
 log_file = open("data/" + file_name, 'w')
 log_file.write("DutyCycle, Velocity \n")
