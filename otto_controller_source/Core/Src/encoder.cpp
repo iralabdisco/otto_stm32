@@ -30,6 +30,8 @@ float Encoder::GetLinearVelocity() {
   float meters = ((float) this->ticks_ * kWheelCircumference)
       / kTicksPerRevolution;
   float deltaTime = this->current_millis_ - this->previous_millis_;
+  if (deltaTime == 0)
+    return 0;
   float linear_velocity = (meters / (deltaTime / 1000));
   return linear_velocity;
 }

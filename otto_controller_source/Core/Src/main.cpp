@@ -97,6 +97,9 @@ uint8_t *rx_buffer;
 odometry_msg odom_msg;
 velocity_msg vel_msg;
 
+//test stuff
+bool flag = true;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -168,10 +171,10 @@ int main(void) {
 //  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
 
   //Enables TIM3 interrupt (used for PID control)
-  HAL_TIM_Base_Start_IT(&htim3);
+//  HAL_TIM_Base_Start_IT(&htim3);
 
   //Enables TIM6 interrupt (used for periodic transmission)
-//  HAL_TIM_Base_Start_IT(&htim6);
+  HAL_TIM_Base_Start_IT(&htim6);
 
   /* USER CODE END 2 */
 
@@ -592,10 +595,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
   //TIMER 2Hz Transmit
   if (htim->Instance == TIM6) {
-    odom.UpdateValues();
+    if(left_dutycycle >= 790){
+      flag = false;
+    } else if(left_dutycycle <= -790){
+      flag = true;
+    }
 
-    odom_msg.angular_velocity = odom.angular_velocity;
-    odom_msg.linear_velocity = odom.linear_velocity;
+    left_motor.set_speed(left_dutycycle);
+    odom_msg.angular_velocity = left_dutycycle;
+    odom_msg.linear_velocity = left_encoder.GetLinearVelocity();
+    if (flag)
+      left_dutycycle++;
+    else
+      left_dutycycle--;
 
     HAL_UART_Transmit(&huart6, tx_buffer, 8, 100);
   }
@@ -653,7 +665,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 { 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
-     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+     tex: printf("Wrong parameduty_cycleters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
