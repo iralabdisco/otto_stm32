@@ -102,19 +102,19 @@ void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef* htim_encoder)
     PA5     ------> TIM2_CH1
     PB3     ------> TIM2_CH2 
     */
-    GPIO_InitStruct.Pin = encoder_dx1_Pin;
+    GPIO_InitStruct.Pin = encoder_sx1_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
-    HAL_GPIO_Init(encoder_dx1_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(encoder_sx1_GPIO_Port, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = encoder_dx2_Pin;
+    GPIO_InitStruct.Pin = encoder_sx2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
-    HAL_GPIO_Init(encoder_dx2_GPIO_Port, &GPIO_InitStruct);
+    HAL_GPIO_Init(encoder_sx2_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN TIM2_MspInit 1 */
 
@@ -133,7 +133,7 @@ void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef* htim_encoder)
     PA0/WKUP     ------> TIM5_CH1
     PA1     ------> TIM5_CH2 
     */
-    GPIO_InitStruct.Pin = encoder_sx1_Pin|encoder_sx2_Pin;
+    GPIO_InitStruct.Pin = encoder_dx1_Pin|encoder_dx2_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -238,9 +238,9 @@ void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef* htim_encoder)
     PA5     ------> TIM2_CH1
     PB3     ------> TIM2_CH2 
     */
-    HAL_GPIO_DeInit(encoder_dx1_GPIO_Port, encoder_dx1_Pin);
+    HAL_GPIO_DeInit(encoder_sx1_GPIO_Port, encoder_sx1_Pin);
 
-    HAL_GPIO_DeInit(encoder_dx2_GPIO_Port, encoder_dx2_Pin);
+    HAL_GPIO_DeInit(encoder_sx2_GPIO_Port, encoder_sx2_Pin);
 
   /* USER CODE BEGIN TIM2_MspDeInit 1 */
 
@@ -258,7 +258,7 @@ void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef* htim_encoder)
     PA0/WKUP     ------> TIM5_CH1
     PA1     ------> TIM5_CH2 
     */
-    HAL_GPIO_DeInit(GPIOA, encoder_sx1_Pin|encoder_sx2_Pin);
+    HAL_GPIO_DeInit(GPIOA, encoder_dx1_Pin|encoder_dx2_Pin);
 
   /* USER CODE BEGIN TIM5_MspDeInit 1 */
 
