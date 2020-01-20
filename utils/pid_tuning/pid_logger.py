@@ -21,7 +21,7 @@ user_input = input("Enter file name: ")
 file_name = user_input + "-" +  datetime.now().strftime("%Y-%m-%d-%H-%M-%S") + ".csv"
 
 log_file = open("data/" + file_name, 'w')
-log_file.write("DutyCycle, Velocity \n")
+log_file.write("DutyCycle Velocity \n")
 
 while 1:
 	ser.reset_input_buffer()

@@ -69,26 +69,27 @@ float baseline = 0.3;
 
 //PID
 
-Pid left_pid(100, 10, 0.0);
-Pid right_pid(300, 50, 0.0);
+Pid left_pid(690, 0, 0);
+Pid right_pid(650, 100, 0.0);
 Pid cross_pid(1, 0.1, 0.0);
 
 int left_dutycycle;
 int right_dutycycle;
+int *address;
 
 //MotorController
 MotorController left_motor(sleep1_GPIO_Port,
-    sleep1_Pin,
-    dir1_GPIO_Port,
-    dir1_Pin,
-    &htim4,
-    TIM_CHANNEL_4);
+sleep1_Pin,
+                           dir1_GPIO_Port,
+                           dir1_Pin,
+                           &htim4,
+                           TIM_CHANNEL_4);
 MotorController right_motor(sleep2_GPIO_Port,
-    sleep2_Pin,
-    dir2_GPIO_Port,
-    dir2_Pin,
-    &htim4,
-    TIM_CHANNEL_3);
+sleep2_Pin,
+                            dir2_GPIO_Port,
+                            dir2_Pin,
+                            &htim4,
+                            TIM_CHANNEL_3);
 
 //Communication
 uint8_t *tx_buffer;
@@ -99,6 +100,10 @@ velocity_msg vel_msg;
 
 //test stuff
 bool flag = true;
+int time;
+int new_time;
+float rx_test;
+int state = 1;  //0 si muove, 1 si ferma
 
 /* USER CODE END PV */
 
@@ -167,21 +172,25 @@ int main(void) {
   tx_buffer = (uint8_t*) &odom_msg;
   rx_buffer = (uint8_t*) &vel_msg;
 
+  address = &left_dutycycle;
+
   //Enables UART RX interrupt
 //  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
 
+  //test plot stuff
+  HAL_UART_Receive_IT(&huart6, (uint8_t*) &rx_test, 4);
+
   //Enables TIM3 interrupt (used for PID control)
-//  HAL_TIM_Base_Start_IT(&htim3);
+  HAL_TIM_Base_Start_IT(&htim3);
 
   //Enables TIM6 interrupt (used for periodic transmission)
-  HAL_TIM_Base_Start_IT(&htim6);
+//  HAL_TIM_Base_Start_IT(&htim6);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -310,7 +319,7 @@ static void MX_TIM3_Init(void) {
 
   /* USER CODE END TIM3_Init 1 */
   htim3.Instance = TIM3;
-  htim3.Init.Prescaler = 9999;
+  htim3.Init.Prescaler = 999;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim3.Init.Period = 159;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -578,26 +587,35 @@ static void MX_GPIO_Init(void) {
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
-  //TIMER 10Hz PID control
+  //TIMER 100Hz PID control
   if (htim->Instance == TIM3) {
 
-//    left_pid.set(1.0);
-    right_pid.set(-0.5);
-
+//    left_pid.set(0.5);
+//    right_pid.set(2);
+//
 //    left_velocity = left_encoder.GetLinearVelocity();
-    right_velocity = right_encoder.GetLinearVelocity();
+//    right_velocity = right_encoder.GetLinearVelocity();
 //    left_dutycycle = left_pid.update(left_velocity);
-    right_dutycycle = right_pid.update(right_velocity);
-
+//    right_dutycycle = right_pid.update(right_velocity);
+//
 //    left_motor.set_speed(left_dutycycle);
-    right_motor.set_speed(right_dutycycle);
+//    right_motor.set_speed(right_dutycycle);
+//
+//    new_time = HAL_GetTick();
+
+    if (state == 0) {
+      left_velocity += 0.01;
+      right_velocity += 0.1;
+      HAL_UART_Transmit(&huart6, (uint8_t*) &rx_test, 4, 100);
+    }
+
   }
 
   //TIMER 2Hz Transmit
   if (htim->Instance == TIM6) {
-    if(left_dutycycle >= 790){
+    if (left_dutycycle >= 790) {
       flag = false;
-    } else if(left_dutycycle <= -790){
+    } else if (left_dutycycle <= -790) {
       flag = true;
     }
 
@@ -614,30 +632,38 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
-  float left_setpoint;
-  float right_setpoint;
-
-  left_setpoint = -(vel_msg.angular_velocity * baseline)
-      + vel_msg.linear_velocity;
-  right_setpoint = vel_msg.linear_velocity * 2 - left_setpoint;
-
-  left_pid.set(left_setpoint);
-  right_pid.set(right_setpoint);
+//  float left_setpoint;
+//  float right_setpoint;
+//
+//  left_setpoint = -(vel_msg.angular_velocity * baseline)
+//      + vel_msg.linear_velocity;
+//  right_setpoint = vel_msg.linear_velocity * 2 - left_setpoint;
+//
+//  left_pid.set(left_setpoint);
+//  right_pid.set(right_setpoint);
 
   //TODO cross pid
 
   //abilita interrupt nuovamente
-  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
+//  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
+
+  //test plot
+  HAL_UART_Receive_IT(&huart6, (uint8_t*) &rx_test, 4);
 
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   if (GPIO_Pin == GPIO_PIN_13) {
-    left_motor.brake();
-    right_motor.brake();
-    while(1){
-
+    if (state == 0) {
+      state = 1;
+      left_motor.brake();
+      right_motor.brake();
     }
+
+    else if (state == 1) {
+      state = 0;
+    }
+
   }
 }
 /* USER CODE END 4 */

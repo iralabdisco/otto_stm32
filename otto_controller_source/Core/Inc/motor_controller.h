@@ -31,10 +31,16 @@ class MotorController {
     if (duty_cycle >= 0) {
 //      HAL_GPIO_WritePin(sleep_gpio_port_, sleep_pin_, GPIO_PIN_SET);
       HAL_GPIO_WritePin(dir_gpio_port_, dir_pin_, GPIO_PIN_RESET);
-      __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, duty_cycle);
+      if (duty_cycle > 790)
+        __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, 790);
+      else
+        __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, duty_cycle);
     } else {
 //      HAL_GPIO_WritePin(sleep_gpio_port_, sleep_pin_, GPIO_PIN_SET);
       HAL_GPIO_WritePin(dir_gpio_port_, dir_pin_, GPIO_PIN_SET);
+      if (duty_cycle < 790)
+        __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, 790);
+      else
       __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, -duty_cycle);
     }
 
