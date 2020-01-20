@@ -30,15 +30,15 @@ class MotorController {
   void set_speed(int duty_cycle) {
     if (duty_cycle >= 0) {
 //      HAL_GPIO_WritePin(sleep_gpio_port_, sleep_pin_, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(dir_gpio_port_, dir_pin_, GPIO_PIN_RESET);
+      HAL_GPIO_WritePin(dir_gpio_port_, dir_pin_, GPIO_PIN_SET);
       if (duty_cycle > 790)
         __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, 790);
       else
         __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, duty_cycle);
-    } else {
+    } else if (duty_cycle < 100){
 //      HAL_GPIO_WritePin(sleep_gpio_port_, sleep_pin_, GPIO_PIN_SET);
-      HAL_GPIO_WritePin(dir_gpio_port_, dir_pin_, GPIO_PIN_SET);
-      if (duty_cycle < 790)
+      HAL_GPIO_WritePin(dir_gpio_port_, dir_pin_, GPIO_PIN_RESET);
+      if (duty_cycle < -790)
         __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, 790);
       else
       __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, -duty_cycle);

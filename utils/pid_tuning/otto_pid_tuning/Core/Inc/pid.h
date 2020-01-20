@@ -38,6 +38,22 @@ class Pid {
 
   }
 
+  void config(float kp, float ki, float kd) {
+    this->kp_ = kp;
+    this->ki_ = ki;
+    this->kd_ = kd;
+
+    this->error_ = 0;
+    this->setpoint_ = 0;
+
+    this->previous_error_ = 0;
+    this->error_sum_index_ = 0;
+
+    for (int i = 0; i < 10; i++) {
+      this->error_sum_array_[i] = 0;
+    }
+  }
+
   void set(float setpoint) {
     this->setpoint_ = setpoint;
   }
@@ -62,7 +78,6 @@ class Pid {
     for (int i = 0; i < 10; i++) {
       error_sum += this->error_sum_array_[i];
     }
-
 
     output += error_sum * this->ki_;
 
