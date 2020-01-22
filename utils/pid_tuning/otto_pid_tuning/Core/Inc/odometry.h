@@ -8,7 +8,6 @@ class Odometry {
  public:
   Encoder left_encoder_;
   Encoder right_encoder_;
-  float kBaseline;
 
   float linear_velocity;
   float angular_velocity;
@@ -17,14 +16,12 @@ class Odometry {
   Odometry() {
     left_encoder_ = NULL;
     right_encoder_ = NULL;
-    kBaseline = 0.35;  //in meters
   }
 
   Odometry(Encoder left, Encoder right) {
 
     left_encoder_ = left;
     right_encoder_ = right;
-    kBaseline = 0.35;  //in meters
   }
 
   void UpdateValues() {
