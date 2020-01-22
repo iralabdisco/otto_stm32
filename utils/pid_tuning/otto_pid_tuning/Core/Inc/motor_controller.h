@@ -2,6 +2,7 @@
 #define MOTOR_CONTROLLER_H
 
 #include "main.h"
+#include "constants.h"
 
 class MotorController {
  public:
@@ -29,18 +30,24 @@ class MotorController {
 
   void set_speed(int duty_cycle) {
     if (duty_cycle >= 0) {
-//      HAL_GPIO_WritePin(sleep_gpio_port_, sleep_pin_, GPIO_PIN_SET);
+      //set direction to forward
       HAL_GPIO_WritePin(dir_gpio_port_, dir_pin_, GPIO_PIN_SET);
-      if (duty_cycle > 790)
-        __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, 790);
+
+      //check if duty_cycle exceeds maximum
+      if (duty_cycle > MAX_DUTY_CYCLE)
+        __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, MAX_DUTY_CYCLE);
       else
         __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, duty_cycle);
-    } else if (duty_cycle < 100){
-//      HAL_GPIO_WritePin(sleep_gpio_port_, sleep_pin_, GPIO_PIN_SET);
+
+    } else if (duty_cycle < 0){
+      //set direction to backwards
       HAL_GPIO_WritePin(dir_gpio_port_, dir_pin_, GPIO_PIN_RESET);
-      if (duty_cycle < -790)
-        __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, 790);
+
+      //check if duty_cycle is lower than minimum
+      if (duty_cycle < -MAX_DUTY_CYCLE)
+        __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, MAX_DUTY_CYCLE);
       else
+        //invert sign to make duty_cycle positive
       __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, -duty_cycle);
     }
 

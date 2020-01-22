@@ -2,6 +2,7 @@
 #define ENCODER_H
 
 #include "main.h"
+#include "constants.h"
 
 class Encoder {
  public:
@@ -9,10 +10,6 @@ class Encoder {
   uint32_t previous_millis_;
   uint32_t current_millis_;
   int32_t ticks_;  //if negative the wheel is going backwards
-
-  uint32_t kTicksPerRevolution = 74000;  //x2 resolution
-  float kPi = 3.14159;
-  float kWheelCircumference = 0.7539;  //in meters
 
   Encoder() {
     timer_ = NULL;

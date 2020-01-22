@@ -97,6 +97,11 @@ uint8_t *rx_buffer;
 pid_setup_msg input_msg;
 plot_msg output_msg;
 
+//user button variables
+int previous_millis = 0;
+int current_millis = 0;
+bool debounce = true;
+
 //test stuff
 float mode = 0;  //0 for setup, 1 left pid, 2 right pid, 3 cross pid, 4 stop
 
@@ -605,16 +610,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   if (htim->Instance == TIM3) {
 
     if (mode == 1) {
-//      left_velocity = left_encoder.GetLinearVelocity();
-//      left_dutycycle = left_pid.update(left_velocity);
-//      left_motor.set_speed(left_dutycycle);
-      left_velocity += 0.01;
+      left_velocity = left_encoder.GetLinearVelocity();
       output_msg.velocity = left_velocity;
+      left_dutycycle = left_pid.update(left_velocity);
+      left_motor.set_speed(left_dutycycle);
+      HAL_UART_Transmit(&huart6, tx_buffer, 4, 100);
+
     }
     if (mode == 2) {
       right_velocity = right_encoder.GetLinearVelocity();
+      output_msg.velocity = right_velocity;
       right_dutycycle = right_pid.update(right_velocity);
       right_motor.set_speed(right_dutycycle);
+      HAL_UART_Transmit(&huart6, tx_buffer, 4, 100);
     }
     if (mode == 3) {
       //TODO cross pid
@@ -624,7 +632,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
   //TIMER 2Hz Transmit
   if (htim->Instance == TIM6) {
-    HAL_UART_Transmit(&huart6, tx_buffer, 4, 100);
   }
 }
 
@@ -632,15 +639,15 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 
   if (input_msg.pid_select == 1) {
 
-    left_pid.config(input_msg.pid_kd, input_msg.pid_ki, input_msg.pid_kp);
+    left_pid.config(input_msg.pid_kp, input_msg.pid_ki, input_msg.pid_kd);
     left_pid.set(input_msg.pid_setpoint);
 
   } else if (input_msg.pid_select == 2) {
-    right_pid.config(input_msg.pid_kd, input_msg.pid_ki, input_msg.pid_kp);
+    right_pid.config(input_msg.pid_kp, input_msg.pid_ki, input_msg.pid_kd);
     right_pid.set(input_msg.pid_setpoint);
 
   } else if (input_msg.pid_select == 3) {
-    cross_pid.config(input_msg.pid_kd, input_msg.pid_ki, input_msg.pid_kp);
+    cross_pid.config(input_msg.pid_kp, input_msg.pid_ki, input_msg.pid_kd);
     cross_pid.set(input_msg.pid_setpoint);
   }
 
@@ -649,21 +656,17 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   //Blue user button
   if (GPIO_Pin == GPIO_PIN_13) {
-    if (mode == 0) {
+    previous_millis = current_millis;
+    current_millis = HAL_GetTick();
+    if (current_millis - previous_millis < 200)
+      debounce = false;
+    else
+      debounce = true;
+    if (mode == 0 && debounce) {
       mode = input_msg.pid_select;
       //Enables TIM3 interrupt (used for PID control)
       HAL_TIM_Base_Start_IT(&htim3);
-
-      //Enables TIM6 interrupt (used for periodic transmission)
-      HAL_TIM_Base_Start_IT(&htim6);
-    } else {
-      left_motor.brake();
-      right_motor.brake();
-      while (1) {
-
-      }
     }
-
   }
 }
 /* USER CODE END 4 */

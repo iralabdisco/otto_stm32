@@ -20,5 +20,6 @@ typedef struct __attribute__((packed)) {
 
 typedef struct __attribute__((packed)) {
   float velocity;
+//  float millis;
 } plot_msg;
 
