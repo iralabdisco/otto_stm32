@@ -1,0 +1,8 @@
+prefix=/home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/devel
+
+Name: joypad_bridge
+Description: Description of joypad_bridge
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

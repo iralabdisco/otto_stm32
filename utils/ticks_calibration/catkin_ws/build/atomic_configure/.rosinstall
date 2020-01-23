@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/devel/setup.sh

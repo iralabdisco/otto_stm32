@@ -1,0 +1,2 @@
+joypad_bridge
+-DCATKIN_DEVEL_PREFIX=/home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/install -G Unix Makefiles
