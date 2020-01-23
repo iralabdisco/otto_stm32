@@ -1,40 +1,31 @@
-#ifndef ODOMETRY_CALC_H
-#define ODOMETRY_CALC_H
+#ifndef ODOMETRY_H
+#define ODOMETRY_H
 
-#include "main.h"
-#include "encoder.h"
+#include "constants.h"
 
 class Odometry {
+ private:
+
+  float left_velocity_;
+  float right_velocity_;
+
+
  public:
-  Encoder left_encoder_;
-  Encoder right_encoder_;
-
-  float linear_velocity;
-  float angular_velocity;
-  int delta_time;
-
   Odometry() {
-    left_encoder_ = NULL;
-    right_encoder_ = NULL;
+    left_velocity_ = 0;
+    right_velocity_ = 0;
   }
 
-  Odometry(Encoder left, Encoder right) {
-
-    left_encoder_ = left;
-    right_encoder_ = right;
+  void UpdateValues(float linear_vel, float angular_vel) {
+    left_velocity_ = linear_vel - (BASELINE * angular_vel)/2;
+    right_velocity_ = 2 * linear_vel - left_velocity_;
   }
 
-  void UpdateValues() {
-    float left_velocity = left_encoder_.GetLinearVelocity();
-    float right_velocity = right_encoder_.GetLinearVelocity();
-
-    //verificato che delta_r == delta_l
-    this->delta_time = left_encoder_.current_millis_
-        - left_encoder_.previous_millis_;
-
-    this->linear_velocity = (left_velocity + right_velocity) / 2;
-    this->angular_velocity = (right_velocity - left_velocity) / kBaseline;
-    return;
+  float GetLeftVelocity(){
+    return left_velocity_;
+  }
+  float GetRightVelocity(){
+    return right_velocity_;
   }
 
 };

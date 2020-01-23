@@ -51,9 +51,12 @@ class MotorController {
       __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, -duty_cycle);
     }
 
+    HAL_GPIO_WritePin(sleep_gpio_port_, sleep_pin_, GPIO_PIN_SET);
+
   }
 
   void brake() {
+    HAL_GPIO_WritePin(sleep_gpio_port_, sleep_pin_, GPIO_PIN_SET);
     __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, 0);
   }
 

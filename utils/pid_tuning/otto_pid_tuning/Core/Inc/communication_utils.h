@@ -12,7 +12,9 @@ typedef struct __attribute__((packed)) {
 
 typedef struct __attribute__((packed)) {
   float pid_select;
-  float pid_setpoint;
+  float pid_setpoint_fixed;
+  float pid_setpoint_lin;
+  float pid_setpoint_ang;
   float pid_kp;
   float pid_ki;
   float pid_kd;

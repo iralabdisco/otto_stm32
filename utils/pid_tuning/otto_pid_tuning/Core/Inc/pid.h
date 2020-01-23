@@ -14,7 +14,7 @@ class Pid {
   float setpoint_;
 
   //needed for integrative term
-  int error_sum_;
+  float error_sum_;
 
   //needed for derivative term
   float previous_error_;
@@ -72,10 +72,10 @@ class Pid {
 
     int integer_output = static_cast<int> (output);
 
-    if(integer_output > this->max_)
-      integer_output = this->max_;
-    else if (integer_output < this->min_)
-      integer_output = this->min_;
+//    if(integer_output > this->max_)
+//      integer_output = this->max_;
+//    else if (integer_output < this->min_)
+//      integer_output = this->min_;
 
     return integer_output;
 

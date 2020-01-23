@@ -10,12 +10,14 @@ class Encoder {
   uint32_t previous_millis_;
   uint32_t current_millis_;
   int32_t ticks_;  //if negative the wheel is going backwards
+  float wheel_circumference_;
 
   Encoder() {
     timer_ = NULL;
+    wheel_circumference_ = 0;
   }
 
-  Encoder(TIM_HandleTypeDef *timer);
+  Encoder(TIM_HandleTypeDef *timer, float wheel_circ);
 
   void Setup();
 
