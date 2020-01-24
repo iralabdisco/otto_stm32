@@ -93,7 +93,7 @@ sleep2_Pin,
 uint8_t *tx_buffer;
 uint8_t *rx_buffer;
 velocity_msg input_msg;
-plot_msg output_msg;
+ticks_msg output_msg;
 
 //user button variables
 int previous_millis = 0;
@@ -101,7 +101,9 @@ int current_millis = 0;
 bool debounce = true;
 
 //test stuff
-float mode = 0;  //0 for setup, 1 left pid, 2 right pid, 3 cross pid, 4 stop
+float mode = 0;  //0 for setup, 1 go, 2 send data
+int left_ticks = 0;
+int right_ticks = 0;
 
 /* USER CODE END PV */
 
@@ -613,10 +615,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   //TIMER 100Hz PID control
   if (htim->Instance == TIM3) {
 
+    left_ticks += left_encoder.UpdateValues();
     left_velocity = left_encoder.GetLinearVelocity();
     left_dutycycle = left_pid.update(left_velocity);
     left_motor.set_speed(left_dutycycle);
 
+    right_ticks += right_encoder.UpdateValues();
     right_velocity = right_encoder.GetLinearVelocity();
     right_dutycycle = right_pid.update(right_velocity);
     right_motor.set_speed(right_dutycycle);
@@ -657,7 +661,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   if (GPIO_Pin == GPIO_PIN_13) {
     previous_millis = current_millis;
     current_millis = HAL_GetTick();
-    if (current_millis - previous_millis < 200)
+    if (current_millis - previous_millis < 500)
       debounce = false;
     else
       debounce = true;
@@ -665,6 +669,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
       mode = 1;
       //Enables TIM3 interrupt (used for PID control)
       HAL_TIM_Base_Start_IT(&htim3);
+    } else if (debounce){
+      mode = 2;
+      output_msg.left_ticks = left_ticks;
+      output_msg.right_ticks = right_ticks;
+      HAL_UART_Transmit(&huart6, tx_buffer, 8, 100);
+      output_msg.left_ticks = 0;
+      output_msg.right_ticks = 0;
     }
   }
 }

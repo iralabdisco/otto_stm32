@@ -12,11 +12,12 @@ void Encoder::Setup() {
   this->current_millis_ = HAL_GetTick();
 }
 
-void Encoder::UpdateValues() {
+int Encoder::UpdateValues() {
   this->previous_millis_ = this->current_millis_;
   this->current_millis_ = HAL_GetTick();
   this->ticks_ = this->GetCount();
   this->ResetCount();
+  return this->ticks_;
 }
 
 float Encoder::GetMeters() {
@@ -27,7 +28,7 @@ float Encoder::GetMeters() {
 }
 
 float Encoder::GetLinearVelocity() {
-  this->UpdateValues();
+//  this->UpdateValues();
   float meters = ((float) this->ticks_ * this->wheel_circumference_)
       / TICKS_PER_REVOLUTION;
   float deltaTime = this->current_millis_ - this->previous_millis_;

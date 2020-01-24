@@ -25,3 +25,8 @@ typedef struct __attribute__((packed)) {
 //  float millis;
 } plot_msg;
 
+typedef struct __attribute__((packed)){
+  int left_ticks;
+  int right_ticks;
+} ticks_msg;
+

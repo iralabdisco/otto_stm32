@@ -58,7 +58,7 @@ def callback(data):
     last_millis = current_millis
     current_millis = int(round(time.time() * 1000))
     rospy.loginfo('I heard %f %f', linear, angular)
-    if (current_millis - last_millis > 50):
+    if (1):
         msg_output = struct.pack('<ff', linear, angular)
         ser.write(msg_output)
         ser.flush()

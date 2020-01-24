@@ -32,7 +32,7 @@ class Encoder {
     __HAL_TIM_SET_COUNTER(timer_, (timer_->Init.Period) / 2);
   }
 
-  void UpdateValues();
+  int UpdateValues();
 
   float GetMeters();
 
