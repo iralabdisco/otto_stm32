@@ -6,8 +6,6 @@ The main program is located in [otto_controller_source](https://github.com/irala
 You can find various useful tools inside the [utils](https://github.com/iralabdisco/otto/tree/pid_control/utils) folder.
 
 See the [wiki](https://github.com/iralabdisco/otto/wiki) for more info about this projects.
-The wiki pages are also available in the '''docs''' folder, as a git submodule.
-
 
 Follow [Google C++ guideline](https://google.github.io/styleguide/cppguide.html) while working on the project
 
