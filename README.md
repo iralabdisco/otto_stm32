@@ -1,4 +1,4 @@
-# otto
+# Otto
 Material regarding my stage with Iralab, designing and realizing a 2 wheeled robot
 
 The main program is located in [otto_controller_source](https://github.com/iralabdisco/otto/tree/pid_control/otto_controller_source).
