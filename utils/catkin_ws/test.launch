@@ -1,0 +1,6 @@
+<launch>
+  <node name="joy_node" pkg="joy" type="joy_node" />
+  <node name="joy_to_cmd_vel" pkg="joypad_bridge" type="joy_to_cmd_vel.py"/>
+  <node name="listener" pkg="joypad_bridge" type="listener.py"/>
+  
+</launch>

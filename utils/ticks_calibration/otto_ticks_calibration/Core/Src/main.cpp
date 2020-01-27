@@ -59,8 +59,8 @@ UART_HandleTypeDef huart6;
 /* USER CODE BEGIN PV */
 
 //Odometry
-Encoder right_encoder = Encoder(&htim5, RIGHT_WHEEL_CIRCUMFERENCE);
-Encoder left_encoder = Encoder(&htim2, LEFT_WHEEL_CIRCUMFERENCE);
+Encoder right_encoder = Encoder(&htim5, RIGHT_TICKS_PER_METER);
+Encoder left_encoder = Encoder(&htim2, LEFT_TICKS_PER_METER);
 Odometry odom = Odometry();
 float left_velocity = 0;
 float right_velocity = 0;
@@ -182,7 +182,7 @@ int main(void)
 
   //Enables UART RX interrupt
   HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
-
+  HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -197,7 +197,7 @@ int main(void)
 
 /**
   * @brief System Clock Configuration
-  * @retval None
+  * @retval Nonewheel_circumference_
   */
 void SystemClock_Config(void)
 {
@@ -615,12 +615,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   //TIMER 100Hz PID control
   if (htim->Instance == TIM3) {
 
-    left_ticks += left_encoder.UpdateValues();
     left_velocity = left_encoder.GetLinearVelocity();
     left_dutycycle = left_pid.update(left_velocity);
     left_motor.set_speed(left_dutycycle);
 
-    right_ticks += right_encoder.UpdateValues();
     right_velocity = right_encoder.GetLinearVelocity();
     right_dutycycle = right_pid.update(right_velocity);
     right_motor.set_speed(right_dutycycle);
@@ -636,6 +634,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
   //TIMER 2Hz Transmit
   if (htim->Instance == TIM6) {
+//    left_ticks = left_encoder.GetMeters();
+//    right_ticks = right_encoder.GetMeters();
   }
 }
 
