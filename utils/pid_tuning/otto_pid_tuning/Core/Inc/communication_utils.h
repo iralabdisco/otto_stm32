@@ -6,8 +6,8 @@ typedef struct __attribute__((packed)) {
 } odometry_msg;
 
 typedef struct __attribute__((packed)) {
-  float angular_velocity;
   float linear_velocity;
+  float angular_velocity;
 } velocity_msg;
 
 typedef struct __attribute__((packed)) {
@@ -24,4 +24,9 @@ typedef struct __attribute__((packed)) {
   float velocity;
 //  float millis;
 } plot_msg;
+
+typedef struct __attribute__((packed)){
+  int left_ticks;
+  int right_ticks;
+} ticks_msg;
 

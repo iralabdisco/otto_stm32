@@ -18,7 +18,7 @@ class Odometry {
 
   void UpdateValues(float linear_vel, float angular_vel) {
     left_velocity_ = linear_vel - (BASELINE * angular_vel)/2;
-    right_velocity_ = 2 * linear_vel - left_velocity_;
+    right_velocity_ = linear_vel + (BASELINE * angular_vel)/2;
   }
 
   float GetLeftVelocity(){

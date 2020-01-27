@@ -224,4 +224,5 @@
 			<resource resourceType="PROJECT" workspacePath="/parlami_ti_prego"/>
 		</configuration>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>

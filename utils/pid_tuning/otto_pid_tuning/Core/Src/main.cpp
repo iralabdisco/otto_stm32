@@ -29,6 +29,7 @@
 #include "motor_controller.h"
 #include "pid.h"
 #include "communication_utils.h"
+#include "constants.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -58,44 +59,49 @@ UART_HandleTypeDef huart6;
 /* USER CODE BEGIN PV */
 
 //Odometry
-Encoder right_encoder = Encoder(&htim5, RIGHT_TICKS_PER_METER);
-Encoder left_encoder = Encoder(&htim2, LEFT_TICKS_PER_METER);
+Encoder right_encoder = Encoder(&htim5, RIGHT_WHEEL_CIRCUMFERENCE);
+Encoder left_encoder = Encoder(&htim2, LEFT_WHEEL_CIRCUMFERENCE);
 Odometry odom = Odometry();
-
-float left_velocity;
-float right_velocity;
+float left_velocity = 0;
+float right_velocity = 0;
 
 //PID
-
-Pid left_pid(180, 200, 0);
-Pid right_pid(185, 195, 0);
-Pid cross_pid(50, 20, 0);
-
+Pid left_pid(0, 0, 0);
+Pid right_pid(0, 0, 0);
+Pid cross_pid(0, 0, 0);
+float left_setpoint;
+float right_setpoint;
+float cross_setpoint;
 int left_dutycycle;
 int right_dutycycle;
 
 //MotorController
-MotorController left_motor(sleep1_GPIO_Port,
+MotorController right_motor(sleep1_GPIO_Port,
 sleep1_Pin,
-                           dir1_GPIO_Port,
-                           dir1_Pin,
-                           &htim4,
-                           TIM_CHANNEL_4);
-MotorController right_motor(sleep2_GPIO_Port,
-sleep2_Pin,
-                            dir2_GPIO_Port,
-                            dir2_Pin,
+                            dir1_GPIO_Port,
+                            dir1_Pin,
                             &htim4,
-                            TIM_CHANNEL_3);
+                            TIM_CHANNEL_4);
+MotorController left_motor(sleep2_GPIO_Port,
+sleep2_Pin,
+                           dir2_GPIO_Port,
+                           dir2_Pin,
+                           &htim4,
+                           TIM_CHANNEL_3);
 
 //Communication
 uint8_t *tx_buffer;
 uint8_t *rx_buffer;
+pid_setup_msg input_msg;
+plot_msg output_msg;
 
-odometry_msg odom_msg;
-velocity_msg vel_msg;
+//user button variables
+int previous_millis = 0;
+int current_millis = 0;
+bool debounce = true;
 
-uint8_t mode = 0;  //setup mode
+//test stuff
+float mode = 0;  //0 for setup, 1 left pid, 2 right pid, 3 cross pid, 4 stop
 
 /* USER CODE END PV */
 
@@ -160,17 +166,15 @@ int main(void) {
 
   left_motor.setup();
   right_motor.setup();
+
   left_motor.coast();
   right_motor.coast();
 
-  tx_buffer = (uint8_t*) &odom_msg;
-  rx_buffer = (uint8_t*) &vel_msg;
+  tx_buffer = (uint8_t*) &output_msg;
+  rx_buffer = (uint8_t*) &input_msg;
 
   //Enables UART RX interrupt
-  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
-
-  //Enables TIM6 interrupt (used for periodic transmission)
-  HAL_TIM_Base_Start_IT(&htim6);
+  HAL_UART_Receive_IT(&huart6, rx_buffer, 28);
 
   /* USER CODE END 2 */
 
@@ -193,11 +197,11 @@ void SystemClock_Config(void) {
   RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
   RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = { 0 };
 
-  /** Configure the main internal regulator output voltage
+  /** Configure the main internal regulator output voltage 
    */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
-  /** Initializes the CPU, AHB and APB busses clocks
+  /** Initializes the CPU, AHB and APB busses clocks 
    */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
@@ -206,7 +210,7 @@ void SystemClock_Config(void) {
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks
+  /** Initializes the CPU, AHB and APB busses clocks 
    */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
       | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
@@ -576,58 +580,96 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   //TIMER 100Hz PID control
   if (htim->Instance == TIM3) {
 
-    left_velocity = left_encoder.GetLinearVelocity();
-    left_dutycycle = left_pid.update(left_velocity);
-    left_motor.set_speed(left_dutycycle);
+    if (mode == 1) {
+      left_velocity = left_encoder.GetLinearVelocity();
+      output_msg.velocity = left_velocity;
+      left_dutycycle = left_pid.update(left_velocity);
+      left_motor.set_speed(left_dutycycle);
+      HAL_UART_Transmit(&huart6, tx_buffer, 4, 100);
 
-    right_velocity = right_encoder.GetLinearVelocity();
-    right_dutycycle = right_pid.update(right_velocity);
-    right_motor.set_speed(right_dutycycle);
+    }
+    if (mode == 2) {
+      right_velocity = right_encoder.GetLinearVelocity();
+      output_msg.velocity = right_velocity;
+      right_dutycycle = right_pid.update(right_velocity);
+      right_motor.set_speed(right_dutycycle);
+      HAL_UART_Transmit(&huart6, tx_buffer, 4, 100);
+    }
+    if (mode == 3) {
 
-    float difference = left_velocity - right_velocity;
+      left_velocity = left_encoder.GetLinearVelocity();
+      left_dutycycle = left_pid.update(left_velocity);
+      left_motor.set_speed(left_dutycycle);
 
-    int cross_dutycycle = cross_pid.update(difference);
+      right_velocity = right_encoder.GetLinearVelocity();
+      right_dutycycle = right_pid.update(right_velocity);
+      right_motor.set_speed(right_dutycycle);
 
-    left_dutycycle += cross_dutycycle;
-    right_dutycycle -= cross_dutycycle;
+      float difference = left_velocity - right_velocity;
+
+      int cross_dutycycle = cross_pid.update(difference);
+
+      left_dutycycle += cross_dutycycle;
+      right_dutycycle -= cross_dutycycle;
+
+      output_msg.velocity = difference;
+      HAL_UART_Transmit(&huart6, tx_buffer, 4, 100);
+
+    }
 
   }
 
   //TIMER 2Hz Transmit
   if (htim->Instance == TIM6) {
-
-    //TODO odometry
-
-    HAL_UART_Transmit(&huart6, tx_buffer, 8, 100);
   }
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
-  odom.UpdateValues(vel_msg.linear_velocity, vel_msg.angular_velocity);
 
-  float left_setpoint = odom.GetLeftVelocity();
-  float right_setpoint = odom.GetRightVelocity();
+  if (input_msg.pid_select == 1) {
 
-  left_pid.set(left_setpoint);
-  right_pid.set(right_setpoint);
+    left_pid.config(input_msg.pid_kp, input_msg.pid_ki, input_msg.pid_kd);
+    left_pid.set(input_msg.pid_setpoint_fixed);
 
-  float cross_setpoint = left_setpoint - right_setpoint;
-  cross_pid.set(cross_setpoint);
+  } else if (input_msg.pid_select == 2) {
+    right_pid.config(input_msg.pid_kp, input_msg.pid_ki, input_msg.pid_kd);
+    right_pid.set(input_msg.pid_setpoint_fixed);
 
-  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
+  } else if (input_msg.pid_select == 3) {
+    left_pid.config(180, 200, 0);
+    right_pid.config(185, 195, 0);
+
+    cross_pid.config(input_msg.pid_kp, input_msg.pid_ki, input_msg.pid_kd);
+
+    odom.UpdateValues(input_msg.pid_setpoint_lin, input_msg.pid_setpoint_ang);
+
+    left_setpoint = input_msg.pid_setpoint_lin
+        - (BASELINE * input_msg.pid_setpoint_ang) / 2;
+    right_setpoint = 2 * input_msg.pid_setpoint_lin - left_setpoint;
+
+    left_pid.set(left_setpoint);
+    right_pid.set(right_setpoint);
+
+    cross_setpoint = left_setpoint - right_setpoint;
+    cross_pid.set(cross_setpoint);
+  }
 
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-  //Blue user button on the NUCLEO board
+  //Blue user button
   if (GPIO_Pin == GPIO_PIN_13) {
-    if (mode == 0) {
-      mode = 1;
+    previous_millis = current_millis;
+    current_millis = HAL_GetTick();
+    if (current_millis - previous_millis < 200)
+      debounce = false;
+    else
+      debounce = true;
+    if (mode == 0 && debounce) {
+      mode = input_msg.pid_select;
       //Enables TIM3 interrupt (used for PID control)
       HAL_TIM_Base_Start_IT(&htim3);
-
     }
-
   }
 }
 /* USER CODE END 4 */

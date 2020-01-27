@@ -6,7 +6,27 @@ typedef struct __attribute__((packed)) {
 } odometry_msg;
 
 typedef struct __attribute__((packed)) {
-  float angular_velocity;
   float linear_velocity;
+  float angular_velocity;
 } velocity_msg;
+
+typedef struct __attribute__((packed)) {
+  float pid_select;
+  float pid_setpoint_fixed;
+  float pid_setpoint_lin;
+  float pid_setpoint_ang;
+  float pid_kp;
+  float pid_ki;
+  float pid_kd;
+} pid_setup_msg;
+
+typedef struct __attribute__((packed)) {
+  float velocity;
+//  float millis;
+} plot_msg;
+
+typedef struct __attribute__((packed)){
+  int left_ticks;
+  int right_ticks;
+} ticks_msg;
 
