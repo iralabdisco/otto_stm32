@@ -1,11 +1,23 @@
 import serial, struct, time
+from serial import SerialException
+
 ser = serial.Serial(
-	port='/dev/ttyUSB0',
         baudrate=115200,
-        parity=serial.PARITY_ODD,
+        parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
         rtscts=False)
+
+while (ser.is_open == False):
+	try:
+		ser.port = '/dev/ttyUSB0'
+		ser.open()
+	except SerialException:
+		print("couldn't open ttyUSB0, check the connection")
+		time.sleep(2)
+print("yay")
+
+
 pid_select = float(input("Enter 1 for left tuning, 2 for right tuning, 3 for cross tuning: "))
 if (pid_select == 3):
 	pid_lin_vel = float(input("Enter the linear velocity setpoint: "))
