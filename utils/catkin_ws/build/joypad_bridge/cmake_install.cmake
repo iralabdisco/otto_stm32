@@ -1,8 +1,8 @@
-# Install script for directory: /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/src/joypad_bridge
+# Install script for directory: /home/fdila/Projects/otto/utils/catkin_ws/src/joypad_bridge
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "/home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/install")
+  set(CMAKE_INSTALL_PREFIX "/home/fdila/Projects/otto/utils/catkin_ws/install")
 endif()
 string(REGEX REPLACE "/$" "" CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
 
@@ -38,17 +38,17 @@ if(NOT DEFINED CMAKE_CROSSCOMPILING)
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/build/joypad_bridge/catkin_generated/installspace/joypad_bridge.pc")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/lib/pkgconfig" TYPE FILE FILES "/home/fdila/Projects/otto/utils/catkin_ws/build/joypad_bridge/catkin_generated/installspace/joypad_bridge.pc")
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/joypad_bridge/cmake" TYPE FILE FILES
-    "/home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/build/joypad_bridge/catkin_generated/installspace/joypad_bridgeConfig.cmake"
-    "/home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/build/joypad_bridge/catkin_generated/installspace/joypad_bridgeConfig-version.cmake"
+    "/home/fdila/Projects/otto/utils/catkin_ws/build/joypad_bridge/catkin_generated/installspace/joypad_bridgeConfig.cmake"
+    "/home/fdila/Projects/otto/utils/catkin_ws/build/joypad_bridge/catkin_generated/installspace/joypad_bridgeConfig-version.cmake"
     )
 endif()
 
 if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/joypad_bridge" TYPE FILE FILES "/home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/src/joypad_bridge/package.xml")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/share/joypad_bridge" TYPE FILE FILES "/home/fdila/Projects/otto/utils/catkin_ws/src/joypad_bridge/package.xml")
 endif()
 

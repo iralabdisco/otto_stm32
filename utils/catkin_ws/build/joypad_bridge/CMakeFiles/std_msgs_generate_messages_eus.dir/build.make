@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/src
+CMAKE_SOURCE_DIR = /home/fdila/Projects/otto/utils/catkin_ws/src
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/build
+CMAKE_BINARY_DIR = /home/fdila/Projects/otto/utils/catkin_ws/build
 
 # Utility rule file for std_msgs_generate_messages_eus.
 
@@ -63,10 +63,10 @@ joypad_bridge/CMakeFiles/std_msgs_generate_messages_eus.dir/build: std_msgs_gene
 .PHONY : joypad_bridge/CMakeFiles/std_msgs_generate_messages_eus.dir/build
 
 joypad_bridge/CMakeFiles/std_msgs_generate_messages_eus.dir/clean:
-	cd /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/build/joypad_bridge && $(CMAKE_COMMAND) -P CMakeFiles/std_msgs_generate_messages_eus.dir/cmake_clean.cmake
+	cd /home/fdila/Projects/otto/utils/catkin_ws/build/joypad_bridge && $(CMAKE_COMMAND) -P CMakeFiles/std_msgs_generate_messages_eus.dir/cmake_clean.cmake
 .PHONY : joypad_bridge/CMakeFiles/std_msgs_generate_messages_eus.dir/clean
 
 joypad_bridge/CMakeFiles/std_msgs_generate_messages_eus.dir/depend:
-	cd /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/src /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/src/joypad_bridge /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/build /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/build/joypad_bridge /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/build/joypad_bridge/CMakeFiles/std_msgs_generate_messages_eus.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/fdila/Projects/otto/utils/catkin_ws/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/fdila/Projects/otto/utils/catkin_ws/src /home/fdila/Projects/otto/utils/catkin_ws/src/joypad_bridge /home/fdila/Projects/otto/utils/catkin_ws/build /home/fdila/Projects/otto/utils/catkin_ws/build/joypad_bridge /home/fdila/Projects/otto/utils/catkin_ws/build/joypad_bridge/CMakeFiles/std_msgs_generate_messages_eus.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : joypad_bridge/CMakeFiles/std_msgs_generate_messages_eus.dir/depend
 
