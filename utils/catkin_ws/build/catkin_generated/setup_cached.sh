@@ -7,4 +7,7 @@
 # new environment variables
 
 # modified environment variables
-export PWD="/home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/build"
+export CMAKE_PREFIX_PATH="/home/fdila/Projects/otto/utils/catkin_ws/devel:$CMAKE_PREFIX_PATH"
+export PWD="/home/fdila/Projects/otto/utils/catkin_ws/build"
+export ROSLISP_PACKAGE_DIRECTORIES="/home/fdila/Projects/otto/utils/catkin_ws/devel/share/common-lisp"
+export ROS_PACKAGE_PATH="/home/fdila/Projects/otto/utils/catkin_ws/src:$ROS_PACKAGE_PATH"

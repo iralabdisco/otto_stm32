@@ -67,14 +67,14 @@ set(joypad_bridge_CONFIG_INCLUDED TRUE)
 
 # set variables for source/devel/install prefixes
 if("FALSE" STREQUAL "TRUE")
-  set(joypad_bridge_SOURCE_PREFIX /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/src/joypad_bridge)
-  set(joypad_bridge_DEVEL_PREFIX /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/devel)
+  set(joypad_bridge_SOURCE_PREFIX /home/fdila/Projects/otto/utils/catkin_ws/src/joypad_bridge)
+  set(joypad_bridge_DEVEL_PREFIX /home/fdila/Projects/otto/utils/catkin_ws/devel)
   set(joypad_bridge_INSTALL_PREFIX "")
   set(joypad_bridge_PREFIX ${joypad_bridge_DEVEL_PREFIX})
 else()
   set(joypad_bridge_SOURCE_PREFIX "")
   set(joypad_bridge_DEVEL_PREFIX "")
-  set(joypad_bridge_INSTALL_PREFIX /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/install)
+  set(joypad_bridge_INSTALL_PREFIX /home/fdila/Projects/otto/utils/catkin_ws/install)
   set(joypad_bridge_PREFIX ${joypad_bridge_INSTALL_PREFIX})
 endif()
 
@@ -154,7 +154,7 @@ foreach(library ${libraries})
     set(lib_path "")
     set(lib "${library}-NOTFOUND")
     # since the path where the library is found is returned we have to iterate over the paths manually
-    foreach(path /home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/install/lib;/home/fdila/Projects/otto/utils/ticks_calibration/catkin_ws/devel/lib;/opt/ros/melodic/lib)
+    foreach(path /home/fdila/Projects/otto/utils/catkin_ws/install/lib;/opt/ros/melodic/lib)
       find_library(lib ${library}
         PATHS ${path}
         NO_DEFAULT_PATH NO_CMAKE_FIND_ROOT_PATH)
