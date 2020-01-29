@@ -30,6 +30,10 @@
 #include "pid.h"
 #include "communication_utils.h"
 #include "constants.h"
+
+#include <pb_encode.h>
+#include <pb_decode.h>
+#include "velocities.pb.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -105,6 +109,15 @@ float mode = 0;  //0 for setup, 1 go, 2 send data
 int left_ticks = 0;
 int right_ticks = 0;
 
+//protobuffers
+Velocities vel_output;
+uint8_t buffer_tx[10];
+pb_ostream_t stream_tx;
+
+Velocities vel_input;
+uint8_t buffer_rx[10];
+pb_istream_t stream_rx;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -178,14 +191,19 @@ int main(void) {
   tx_buffer = (uint8_t*) &output_msg;
   rx_buffer = (uint8_t*) &input_msg;
 
+  vel_output.angular_vel = 1;
+  vel_output.linear_vel = 2;
+  stream_tx = pb_ostream_from_buffer(buffer_tx, sizeof(buffer_tx));
+
   //Enables UART RX interrupt
-  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
+  HAL_UART_Receive_IT(&huart6, buffer_rx, 10);
   HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -604,23 +622,43 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
   //TIMER 2Hz Transmit
   if (htim->Instance == TIM6) {
+
+    odom.UpdateValuesFromWheels(left_encoder.GetLinearVelocity(),
+                                right_encoder.GetLinearVelocity());
+
+    vel_output.linear_vel = odom.GetLinearVelocity();
+    vel_output.angular_vel = odom.GetAngularVelocity();
+
+    stream_tx = pb_ostream_from_buffer(buffer_tx, sizeof(buffer_tx));
+
+    pb_encode(&stream_tx, Velocities_fields, &vel_output);
+
+    HAL_UART_Transmit(&huart6, buffer_tx, 10, 100);
   }
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 
-  odom.UpdateValues(input_msg.linear_velocity, input_msg.angular_velocity);
+  pb_istream_t stream = pb_istream_from_buffer(buffer_rx, 10);
 
-  left_setpoint = odom.GetLeftVelocity();
-  right_setpoint = odom.GetRightVelocity();
+  bool status = pb_decode(&stream, Velocities_fields, &vel_input);
 
-  left_pid.set(left_setpoint);
-  right_pid.set(right_setpoint);
+  // if decoding went ok
+  if (status) {
 
-  cross_setpoint = left_setpoint - right_setpoint;
-  cross_pid.set(cross_setpoint);
+    odom.UpdateValuesFromVel(vel_input.linear_vel, vel_input.angular_vel);
 
-  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
+    left_setpoint = odom.GetLeftVelocity();
+    right_setpoint = odom.GetRightVelocity();
+
+    left_pid.set(left_setpoint);
+    right_pid.set(right_setpoint);
+
+    cross_setpoint = left_setpoint - right_setpoint;
+    cross_pid.set(cross_setpoint);
+  }
+
+  HAL_UART_Receive_IT(&huart6, buffer_rx, 10);
 
 }
 
@@ -637,16 +675,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
       mode = 1;
       //Enables TIM3 interrupt (used for PID control)
       HAL_TIM_Base_Start_IT(&htim3);
-    } else if (debounce) {
-      mode = 2;
-      output_msg.left_ticks = left_ticks;
-      output_msg.right_ticks = right_ticks;
-      HAL_UART_Transmit(&huart6, tx_buffer, 8, 100);
-      output_msg.left_ticks = 0;
-      output_msg.right_ticks = 0;
     }
   }
 }
+
 /* USER CODE END 4 */
 
 /**

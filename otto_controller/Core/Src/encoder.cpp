@@ -1,14 +1,8 @@
 #include "encoder.h"
 
-//Encoder::Encoder(TIM_HandleTypeDef *timer, float wheel_circ) {
-//  timer_ = timer;
-//  wheel_circumference_ = wheel_circ;
-//
-//}
-
-Encoder::Encoder(TIM_HandleTypeDef *timer, int ticks_per_meter) {
+Encoder::Encoder(TIM_HandleTypeDef *timer, float wheel_circ) {
   timer_ = timer;
-  ticks_per_meter_ = ticks_per_meter;
+  wheel_circumference_ = wheel_circ;
 
 }
 
@@ -26,17 +20,11 @@ void Encoder::UpdateValues() {
   this->ResetCount();
 }
 
-//float Encoder::GetMeters() {
-//  float meters = ((float) this->ticks_ * this->wheel_circumference_)
-//      / TICKS_PER_REVOLUTION;
-//  return meters;
-//}
-
 float Encoder::GetMeters() {
-  float meters = (((float) this->ticks_) / this->ticks_per_meter_);
+  float meters = ((float) this->ticks_ * this->wheel_circumference_)
+      / TICKS_PER_REVOLUTION;
   return meters;
 }
-
 
 float Encoder::GetLinearVelocity() {
   this->UpdateValues();

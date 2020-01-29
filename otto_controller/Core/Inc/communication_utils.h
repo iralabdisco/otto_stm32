@@ -30,3 +30,8 @@ typedef struct __attribute__((packed)){
   int right_ticks;
 } ticks_msg;
 
+typedef struct __attribute__((packed)){
+  float left_vel;
+  float right_vel;
+} wheel_msg;
+

@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message Velocities {
+    float linear_vel = 1;
+    float angular_vel = 2;
+}

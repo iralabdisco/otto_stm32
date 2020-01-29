@@ -58,8 +58,8 @@ UART_HandleTypeDef huart6;
 /* USER CODE BEGIN PV */
 
 //Odometry
-Encoder right_encoder = Encoder(&htim5, RIGHT_TICKS_PER_METER);
-Encoder left_encoder = Encoder(&htim2, LEFT_TICKS_PER_METER);
+Encoder right_encoder = Encoder(&htim5, RIGHT_WHEEL_CIRCUMFERENCE);
+Encoder left_encoder = Encoder(&htim2, LEFT_WHEEL_CIRCUMFERENCE);
 Odometry odom = Odometry();
 
 float left_velocity;
@@ -75,25 +75,25 @@ int left_dutycycle;
 int right_dutycycle;
 
 //MotorController
-MotorController left_motor(sleep1_GPIO_Port,
+MotorController right_motor(sleep1_GPIO_Port,
 sleep1_Pin,
-                           dir1_GPIO_Port,
-                           dir1_Pin,
-                           &htim4,
-                           TIM_CHANNEL_4);
-MotorController right_motor(sleep2_GPIO_Port,
-sleep2_Pin,
-                            dir2_GPIO_Port,
-                            dir2_Pin,
+                            dir1_GPIO_Port,
+                            dir1_Pin,
                             &htim4,
-                            TIM_CHANNEL_3);
+                            TIM_CHANNEL_4);
+MotorController left_motor(sleep2_GPIO_Port,
+sleep2_Pin,
+                           dir2_GPIO_Port,
+                           dir2_Pin,
+                           &htim4,
+                           TIM_CHANNEL_3);
 
 //Communication
 uint8_t *tx_buffer;
 uint8_t *rx_buffer;
 
-odometry_msg odom_msg;
 velocity_msg vel_msg;
+wheel_msg wheels_msg;
 
 uint8_t mode = 0;  //setup mode
 
@@ -160,17 +160,15 @@ int main(void) {
 
   left_motor.setup();
   right_motor.setup();
+
   left_motor.coast();
   right_motor.coast();
 
-  tx_buffer = (uint8_t*) &odom_msg;
+  tx_buffer = (uint8_t*) &wheels_msg;
   rx_buffer = (uint8_t*) &vel_msg;
 
   //Enables UART RX interrupt
   HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
-
-  //Enables TIM6 interrupt (used for periodic transmission)
-  HAL_TIM_Base_Start_IT(&htim6);
 
   /* USER CODE END 2 */
 
@@ -193,11 +191,11 @@ void SystemClock_Config(void) {
   RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
   RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = { 0 };
 
-  /** Configure the main internal regulator output voltage
+  /** Configure the main internal regulator output voltage 
    */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
-  /** Initializes the CPU, AHB and APB busses clocks
+  /** Initializes the CPU, AHB and APB busses clocks 
    */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
@@ -206,7 +204,7 @@ void SystemClock_Config(void) {
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks
+  /** Initializes the CPU, AHB and APB busses clocks 
    */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
       | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
@@ -237,7 +235,7 @@ static void MX_NVIC_Init(void) {
   HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 2, 2);
   HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
   /* USART6_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(USART6_IRQn, 2, 0);
+  HAL_NVIC_SetPriority(USART6_IRQn, 1, 0);
   HAL_NVIC_EnableIRQ(USART6_IRQn);
 }
 
@@ -481,9 +479,9 @@ static void MX_USART6_UART_Init(void) {
   /* USER CODE END USART6_Init 1 */
   huart6.Instance = USART6;
   huart6.Init.BaudRate = 115200;
-  huart6.Init.WordLength = UART_WORDLENGTH_9B;
+  huart6.Init.WordLength = UART_WORDLENGTH_8B;
   huart6.Init.StopBits = UART_STOPBITS_1;
-  huart6.Init.Parity = UART_PARITY_ODD;
+  huart6.Init.Parity = UART_PARITY_NONE;
   huart6.Init.Mode = UART_MODE_TX_RX;
   huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
   huart6.Init.OverSampling = UART_OVERSAMPLING_16;
@@ -591,14 +589,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     left_dutycycle += cross_dutycycle;
     right_dutycycle -= cross_dutycycle;
 
+    wheels_msg.left_vel = left_velocity;
+    wheels_msg.right_vel = right_velocity;
+
   }
 
   //TIMER 2Hz Transmit
   if (htim->Instance == TIM6) {
 
     //TODO odometry
-
-    HAL_UART_Transmit(&huart6, tx_buffer, 8, 100);
+    HAL_UART_Transmit_IT(&huart6, tx_buffer, 8);
   }
 }
 
@@ -625,6 +625,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
       mode = 1;
       //Enables TIM3 interrupt (used for PID control)
       HAL_TIM_Base_Start_IT(&htim3);
+      //Enables TIM6 interrupt (used for periodic transmission)
+      HAL_TIM_Base_Start_IT(&htim6);
 
     }
 
