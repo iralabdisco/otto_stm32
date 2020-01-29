@@ -6,12 +6,6 @@ Encoder::Encoder(TIM_HandleTypeDef *timer, float wheel_circ) {
 
 }
 
-//Encoder::Encoder(TIM_HandleTypeDef *timer, int ticks_per_meter) {
-//  timer_ = timer;
-//  ticks_per_meter_ = ticks_per_meter;
-//
-//}
-
 void Encoder::Setup() {
   HAL_TIM_Encoder_Start(timer_, TIM_CHANNEL_ALL);
   this->ResetCount();
@@ -31,12 +25,6 @@ float Encoder::GetMeters() {
       / TICKS_PER_REVOLUTION;
   return meters;
 }
-
-//float Encoder::GetMeters() {
-//  float meters = ((float) (this->ticks_) / this->ticks_per_meter_);
-//  return meters;
-//}
-
 
 float Encoder::GetLinearVelocity() {
   this->UpdateValues();
