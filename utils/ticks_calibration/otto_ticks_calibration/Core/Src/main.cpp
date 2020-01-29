@@ -59,7 +59,7 @@ UART_HandleTypeDef huart6;
 /* USER CODE BEGIN PV */
 
 //Odometry
-Encoder right_encoder = Encoder(&htim5, RIGHT_TICKS_PER_METER);
+Encoder right_encoder = Encoder(&htim5, RIGHT_WHEEL_CIRCUMFERENCE);
 Encoder left_encoder = Encoder(&htim2, LEFT_TICKS_PER_METER);
 Odometry odom = Odometry();
 float left_velocity = 0;
@@ -585,20 +585,26 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   //TIMER 100Hz PID control
   if (htim->Instance == TIM3) {
 
-    left_velocity = left_encoder.GetLinearVelocity();
-    left_dutycycle = left_pid.update(left_velocity);
-    left_motor.set_speed(left_dutycycle);
+    left_pid.set(0.5);
+    right_pid.set(0.5);
+    cross_pid.set(0);
+
+//    left_velocity = left_encoder.GetLinearVelocity();
+//    left_dutycycle = left_pid.update(left_velocity);
+//    left_motor.set_speed(left_dutycycle);
 
     right_velocity = right_encoder.GetLinearVelocity();
     right_dutycycle = right_pid.update(right_velocity);
     right_motor.set_speed(right_dutycycle);
 
-    float difference = left_velocity - right_velocity;
+//    float difference = left_velocity - right_velocity;
+//
+//    int cross_dutycycle = cross_pid.update(difference);
+//
+//    left_dutycycle += cross_dutycycle;
+//    right_dutycycle -= cross_dutycycle;
 
-    int cross_dutycycle = cross_pid.update(difference);
-
-    left_dutycycle += cross_dutycycle;
-    right_dutycycle -= cross_dutycycle;
+    HAL_UART_Transmit(&huart6, (uint8_t*) &right_velocity, 4, 100);
 
   }
 

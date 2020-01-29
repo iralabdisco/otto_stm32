@@ -6,7 +6,7 @@ from serial import SerialException
 
 ser = serial.Serial(
         baudrate=115200,
-        parity=serial.PARITY_NONE,
+        parity=serial.PARITY_ODD,
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
         rtscts=False)

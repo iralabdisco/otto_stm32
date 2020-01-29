@@ -19,8 +19,8 @@ class Encoder {
     ticks_per_meter_ = 0;
   }
 
-//  Encoder(TIM_HandleTypeDef *timer, float wheel_circ);
-  Encoder(TIM_HandleTypeDef *timer, int ticks_per_meters);
+  Encoder(TIM_HandleTypeDef *timer, float wheel_circ);
+//  Encoder(TIM_HandleTypeDef *timer, int ticks_per_meters);
 
 
   void Setup();

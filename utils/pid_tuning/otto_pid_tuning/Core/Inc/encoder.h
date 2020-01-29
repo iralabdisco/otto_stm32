@@ -11,17 +11,13 @@ class Encoder {
   uint32_t current_millis_;
   int32_t ticks_;  //if negative the wheel is going backwards
   float wheel_circumference_;
-  int ticks_per_meter_;
 
   Encoder() {
     timer_ = NULL;
     wheel_circumference_ = 0;
-    ticks_per_meter_ = 0;
   }
 
-//  Encoder(TIM_HandleTypeDef *timer, float wheel_circ);
-  Encoder(TIM_HandleTypeDef *timer, int ticks_per_meters);
-
+  Encoder(TIM_HandleTypeDef *timer, float wheel_circ);
 
   void Setup();
 
@@ -33,7 +29,7 @@ class Encoder {
 
   void ResetCount() {
     //set counter to half its maximum value
-    __HAL_TIM_SET_COUNTER(timer_, (timer_->Init.Period / 2));
+    __HAL_TIM_SET_COUNTER(timer_, (timer_->Init.Period) / 2);
   }
 
   void UpdateValues();
