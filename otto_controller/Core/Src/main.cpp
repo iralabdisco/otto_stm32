@@ -52,19 +52,30 @@
 
 /* USER CODE BEGIN PV */
 
+//Parameters
+float baseline = 0.3; //distance between wheels in meters
+int ticks_per_revolution = 148000; //x4 resolution
+float right_wheel_circumference = 0.783; //in meters
+float left_wheel_circumference = 0.789; //in meters
+
+int min_duty_cycle = -799;
+int max_duty_cycle = 799;
+
 //Odometry
-Encoder right_encoder = Encoder(&htim5, RIGHT_WHEEL_CIRCUMFERENCE);
-Encoder left_encoder = Encoder(&htim2, LEFT_WHEEL_CIRCUMFERENCE);
-Odometry odom = Odometry();
+Encoder right_encoder = Encoder(&htim5, right_wheel_circumference,
+		ticks_per_revolution);
+Encoder left_encoder = Encoder(&htim2, left_wheel_circumference,
+		ticks_per_revolution);
+Odometry odom = Odometry(baseline);
 
 float left_velocity;
 float right_velocity;
 
 //PID
 
-Pid left_pid(180, 200, 0);
-Pid right_pid(185, 195, 0);
-Pid cross_pid(50, 20, 0);
+Pid left_pid(180, 200, 0, min_duty_cycle, max_duty_cycle);
+Pid right_pid(185, 195, 0, min_duty_cycle, max_duty_cycle);
+Pid cross_pid(50, 20, 0, min_duty_cycle, max_duty_cycle);
 
 int left_dutycycle;
 int right_dutycycle;
@@ -72,16 +83,14 @@ int right_dutycycle;
 //MotorController
 MotorController right_motor(sleep1_GPIO_Port,
 sleep1_Pin,
-                            dir1_GPIO_Port,
-                            dir1_Pin,
-                            &htim4,
-                            TIM_CHANNEL_4);
+dir1_GPIO_Port,
+dir1_Pin, &htim4,
+TIM_CHANNEL_4);
 MotorController left_motor(sleep2_GPIO_Port,
 sleep2_Pin,
-                           dir2_GPIO_Port,
-                           dir2_Pin,
-                           &htim4,
-                           TIM_CHANNEL_3);
+dir2_GPIO_Port,
+dir2_Pin, &htim4,
+TIM_CHANNEL_3);
 
 //Communication
 uint8_t *tx_buffer;
@@ -107,209 +116,201 @@ static void MX_NVIC_Init(void);
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
-  /* USER CODE BEGIN 1 */
-  /* USER CODE END 1 */
-  
+ * @brief  The application entry point.
+ * @retval int
+ */
+int main(void) {
+	/* USER CODE BEGIN 1 */
+	/* USER CODE END 1 */
 
-  /* MCU Configuration--------------------------------------------------------*/
+	/* MCU Configuration--------------------------------------------------------*/
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	HAL_Init();
 
-  /* USER CODE BEGIN Init */
+	/* USER CODE BEGIN Init */
 
-  /* USER CODE END Init */
+	/* USER CODE END Init */
 
-  /* Configure the system clock */
-  SystemClock_Config();
+	/* Configure the system clock */
+	SystemClock_Config();
 
-  /* USER CODE BEGIN SysInit */
+	/* USER CODE BEGIN SysInit */
 
-  /* USER CODE END SysInit */
+	/* USER CODE END SysInit */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_TIM2_Init();
-  MX_TIM3_Init();
-  MX_TIM4_Init();
-  MX_TIM5_Init();
-  MX_USART6_UART_Init();
-  MX_TIM6_Init();
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_TIM2_Init();
+	MX_TIM3_Init();
+	MX_TIM4_Init();
+	MX_TIM5_Init();
+	MX_TIM6_Init();
+	MX_USART6_UART_Init();
 
-  /* Initialize interrupts */
-  MX_NVIC_Init();
-  /* USER CODE BEGIN 2 */
+	/* Initialize interrupts */
+	MX_NVIC_Init();
+	/* USER CODE BEGIN 2 */
 
-  left_encoder.Setup();
-  right_encoder.Setup();
+	left_encoder.Setup();
+	right_encoder.Setup();
 
-  left_motor.setup();
-  right_motor.setup();
+	left_motor.setup();
+	right_motor.setup();
 
-  left_motor.coast();
-  right_motor.coast();
+	left_motor.coast();
+	right_motor.coast();
 
-  tx_buffer = (uint8_t*) &wheels_msg;
-  rx_buffer = (uint8_t*) &vel_msg;
+	tx_buffer = (uint8_t*) &wheels_msg;
+	rx_buffer = (uint8_t*) &vel_msg;
 
-  //Enables UART RX interrupt
-  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
+	//Enables UART RX interrupt
+	HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
 
-  /* USER CODE END 2 */
+	/* USER CODE END 2 */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1) {
-    /* USER CODE END WHILE */
+	/* Infinite loop */
+	/* USER CODE BEGIN WHILE */
+	while (1) {
+		/* USER CODE END WHILE */
 
-    /* USER CODE BEGIN 3 */
-  }
-  /* USER CODE END 3 */
+		/* USER CODE BEGIN 3 */
+	}
+	/* USER CODE END 3 */
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+ * @brief System Clock Configuration
+ * @retval None
+ */
+void SystemClock_Config(void) {
+	RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
+	RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
+	RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = { 0 };
 
-  /** Configure the main internal regulator output voltage 
-  */
-  __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
-  /** Initializes the CPU, AHB and APB busses clocks 
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Initializes the CPU, AHB and APB busses clocks 
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+	/** Configure the main internal regulator output voltage
+	 */
+	__HAL_RCC_PWR_CLK_ENABLE();
+	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+	/** Initializes the CPU, AHB and APB busses clocks
+	 */
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+	RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+		Error_Handler();
+	}
+	/** Initializes the CPU, AHB and APB busses clocks
+	 */
+	RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+			| RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART6;
-  PeriphClkInitStruct.Usart6ClockSelection = RCC_USART6CLKSOURCE_PCLK2;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
+	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) {
+		Error_Handler();
+	}
+	PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART6;
+	PeriphClkInitStruct.Usart6ClockSelection = RCC_USART6CLKSOURCE_PCLK2;
+	if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
+		Error_Handler();
+	}
 }
 
 /**
-  * @brief NVIC Configuration.
-  * @retval None
-  */
-static void MX_NVIC_Init(void)
-{
-  /* TIM3_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(TIM3_IRQn, 2, 1);
-  HAL_NVIC_EnableIRQ(TIM3_IRQn);
-  /* TIM6_DAC_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 2, 2);
-  HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
-  /* USART6_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(USART6_IRQn, 1, 0);
-  HAL_NVIC_EnableIRQ(USART6_IRQn);
+ * @brief NVIC Configuration.
+ * @retval None
+ */
+static void MX_NVIC_Init(void) {
+	/* TIM3_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(TIM3_IRQn, 2, 1);
+	HAL_NVIC_EnableIRQ(TIM3_IRQn);
+	/* TIM6_DAC_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 2, 2);
+	HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
+	/* USART6_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(USART6_IRQn, 1, 0);
+	HAL_NVIC_EnableIRQ(USART6_IRQn);
 }
 
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
-  //TIMER 100Hz PID control
-  if (htim->Instance == TIM3) {
+	//TIMER 100Hz PID control
+	if (htim->Instance == TIM3) {
 
-    left_velocity = left_encoder.GetLinearVelocity();
-    left_dutycycle = left_pid.update(left_velocity);
-    left_motor.set_speed(left_dutycycle);
+		left_velocity = left_encoder.GetLinearVelocity();
+		left_dutycycle = left_pid.update(left_velocity);
+		left_motor.set_speed(left_dutycycle);
 
-    right_velocity = right_encoder.GetLinearVelocity();
-    right_dutycycle = right_pid.update(right_velocity);
-    right_motor.set_speed(right_dutycycle);
+		right_velocity = right_encoder.GetLinearVelocity();
+		right_dutycycle = right_pid.update(right_velocity);
+		right_motor.set_speed(right_dutycycle);
 
-    float difference = left_velocity - right_velocity;
+		float difference = left_velocity - right_velocity;
 
-    int cross_dutycycle = cross_pid.update(difference);
+		int cross_dutycycle = cross_pid.update(difference);
 
-    left_dutycycle += cross_dutycycle;
-    right_dutycycle -= cross_dutycycle;
+		left_dutycycle += cross_dutycycle;
+		right_dutycycle -= cross_dutycycle;
 
-    wheels_msg.left_vel = left_velocity;
-    wheels_msg.right_vel = right_velocity;
+		wheels_msg.left_vel = left_velocity;
+		wheels_msg.right_vel = right_velocity;
 
-  }
+	}
 
-  //TIMER 2Hz Transmit
-  if (htim->Instance == TIM6) {
+	//TIMER 2Hz Transmit
+	if (htim->Instance == TIM6) {
 
-    //TODO odometry
-    HAL_UART_Transmit_IT(&huart6, tx_buffer, 8);
-  }
+		//TODO odometry
+		HAL_UART_Transmit_IT(&huart6, tx_buffer, 8);
+	}
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
-  odom.UpdateValues(vel_msg.linear_velocity, vel_msg.angular_velocity);
+	odom.UpdateValues(vel_msg.linear_velocity, vel_msg.angular_velocity);
 
-  float left_setpoint = odom.GetLeftVelocity();
-  float right_setpoint = odom.GetRightVelocity();
+	float left_setpoint = odom.GetLeftVelocity();
+	float right_setpoint = odom.GetRightVelocity();
 
-  left_pid.set(left_setpoint);
-  right_pid.set(right_setpoint);
+	left_pid.set(left_setpoint);
+	right_pid.set(right_setpoint);
 
-  float cross_setpoint = left_setpoint - right_setpoint;
-  cross_pid.set(cross_setpoint);
+	float cross_setpoint = left_setpoint - right_setpoint;
+	cross_pid.set(cross_setpoint);
 
-  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
+	HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
 
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-  //Blue user button on the NUCLEO board
-  if (GPIO_Pin == GPIO_PIN_13) {
-    if (mode == 0) {
-      mode = 1;
-      //Enables TIM3 interrupt (used for PID control)
-      HAL_TIM_Base_Start_IT(&htim3);
-      //Enables TIM6 interrupt (used for periodic transmission)
-      HAL_TIM_Base_Start_IT(&htim6);
+	//Blue user button on the NUCLEO board
+	if (GPIO_Pin == GPIO_PIN_13) {
+		if (mode == 0) {
+			mode = 1;
+			//Enables TIM3 interrupt (used for PID control)
+			HAL_TIM_Base_Start_IT(&htim3);
+			//Enables TIM6 interrupt (used for periodic transmission)
+			HAL_TIM_Base_Start_IT(&htim6);
 
-    }
+		}
 
-  }
+	}
 }
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void) {
+	/* USER CODE BEGIN Error_Handler_Debug */
+	/* User can add his own implementation to report the HAL error return state */
 
-  /* USER CODE END Error_Handler_Debug */
+	/* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT

@@ -2,7 +2,6 @@
 #define ENCODER_H
 
 #include "main.h"
-#include "constants.h"
 
 class Encoder {
  public:
@@ -10,6 +9,7 @@ class Encoder {
   uint32_t previous_millis_;
   uint32_t current_millis_;
   int32_t ticks_;  //if negative the wheel is going backwards
+  int ticks_per_revolution_;
   float wheel_circumference_;
 
   Encoder() {
@@ -17,10 +17,10 @@ class Encoder {
     wheel_circumference_ = 0;
   }
 
-  Encoder(TIM_HandleTypeDef *timer, float wheel_circ) {
+  Encoder(TIM_HandleTypeDef *timer, float wheel_circ, int ticks_per_revolution) {
      timer_ = timer;
      wheel_circumference_ = wheel_circ;
-
+     ticks_per_revolution_ = ticks_per_revolution;
    }
 
   int GetCount() {
@@ -50,7 +50,7 @@ class Encoder {
 
   float GetMeters() {
     float meters = ((float) this->ticks_ * this->wheel_circumference_)
-        / TICKS_PER_REVOLUTION;
+        / ticks_per_revolution_;
     return meters;
   }
 
