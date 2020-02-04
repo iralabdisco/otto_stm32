@@ -75,3 +75,13 @@ RemoteSystemsTempFiles/
 */stm32f7xx_it.c
 */sysmem.c
 */system_stm32f7xx.c
+
+# Peripherals autogen files
+*/gpio.h
+*/sys.h
+*/tim.h
+*/usart.h
+*/gpio.c
+*/sys.c
+*/tim.c
+*/usart.c
