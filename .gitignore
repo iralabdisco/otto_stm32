@@ -54,5 +54,7 @@ dkms.conf
 # Eclipse
 .metadata/
 RemoteSystemsTempFiles/
-*/Debug
-*/Release
+**/Debug
+**/Release
+**/*Debug.launch
+**/*Release.launch
