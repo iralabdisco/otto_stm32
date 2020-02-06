@@ -65,7 +65,7 @@ RemoteSystemsTempFiles/
 */Startup
 *.s
 *Debug.launch
-*.ld
+*Release.launch
 
 **/stm32f7xx_hal_conf.h
 **/stm32f7xx_it.h
