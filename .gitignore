@@ -85,3 +85,7 @@ RemoteSystemsTempFiles/
 **/sys.c
 **/tim.c
 **/usart.c
+
+#ROS
+catkin_ws/devel/
+catkin_ws/build/
