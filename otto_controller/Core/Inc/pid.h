@@ -1,8 +1,6 @@
 #ifndef PID_H
 #define PID_H
 
-#include "constants.h"
-
 class Pid {
  public:
   //PID constants
@@ -32,9 +30,6 @@ class Pid {
 
     this->previous_error_ = 0;
     this->error_sum_ = 0;
-
-    this->min_ = -MAX_DUTY_CYCLE;
-    this->max_ = MAX_DUTY_CYCLE;
 
   }
 
