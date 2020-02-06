@@ -1,0 +1,6 @@
+<launch>
+  <node name="rosserial_python" pkg="rosserial_python" type="serial_node.py">
+	  <param name="port" value="/dev/ttyUSB1" />
+  </node>
+  <node name="cmd_vel_transmitter" pkg="joypad_bridge" type="cmd_vel_transmitter.py" output="screen"/>
+</launch>
