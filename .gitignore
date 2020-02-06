@@ -58,3 +58,13 @@ RemoteSystemsTempFiles/
 **/Release
 **/*Debug.launch
 **/*Release.launch
+
+#ROS
+devel/
+logs/
+build/
+bin/
+lib/
+msg_gen/
+srv_gen/
+
