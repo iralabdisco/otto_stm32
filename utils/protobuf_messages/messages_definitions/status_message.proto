@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+message VelocityCommand {
+  float linear_velocity = 1;
+  float angular_velocity = 2;
+  fixed64 delta_millis = 3;
+  enum Status {
+    UNKNOWN = 0;
+    WAITING_CONFIG = 1;
+    READY = 2;
+    RUNNING = 3;
+  }
+  Status status = 4;
+}
