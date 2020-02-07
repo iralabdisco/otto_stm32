@@ -168,6 +168,7 @@ int main(void) {
   left_motor.setup();
   right_motor.setup();
 
+  //right and left motors have the same parameters
   pid_min = - left_motor.max_dutycycle_;
   pid_max = left_motor.max_dutycycle_;
 
