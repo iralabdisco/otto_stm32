@@ -69,10 +69,12 @@ float left_velocity;
 float right_velocity;
 
 //PID
+int pid_min = 0;
+int pid_max = 0;
 
-Pid left_pid(180, 200, 0);
-Pid right_pid(185, 195, 0);
-Pid cross_pid(50, 20, 0);
+Pid left_pid(180, 200, 0, pid_min, pid_max);
+Pid right_pid(185, 195, 0, pid_min, pid_max);
+Pid cross_pid(50, 20, 0, pid_min, pid_max);
 
 int left_dutycycle;
 int right_dutycycle;
@@ -82,14 +84,12 @@ MotorController right_motor(sleep1_GPIO_Port,
 sleep1_Pin,
                             dir1_GPIO_Port,
                             dir1_Pin,
-                            &htim4,
-                            TIM_CHANNEL_4);
+                            &htim4, TIM_CHANNEL_4);
 MotorController left_motor(sleep2_GPIO_Port,
 sleep2_Pin,
                            dir2_GPIO_Port,
                            dir2_Pin,
-                           &htim4,
-                           TIM_CHANNEL_3);
+                           &htim4, TIM_CHANNEL_3);
 
 //Communication
 uint8_t *tx_buffer;
@@ -157,6 +157,14 @@ int main(void) {
   left_motor.setup();
   right_motor.setup();
 
+  //right and left motors have the same parameters
+  pid_min = -left_motor.max_dutycycle_;
+  pid_max = left_motor.max_dutycycle_;
+
+  left_pid.config(180, 200, 0, pid_min, pid_max);
+  right_pid.config(185, 195, 0, pid_min, pid_max);
+  cross_pid.config(50, 20, 0, pid_min, pid_max);
+
   left_motor.coast();
   right_motor.coast();
 
@@ -190,8 +198,7 @@ void SystemClock_Config(void) {
   /** Configure the main internal regulator output voltage 
    */
   __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
-  /** Initializes the CPU, AHB and APB busses clocks 
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);/** Initializes the CPU, AHB and APB busses clocks
    */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
@@ -226,13 +233,13 @@ void SystemClock_Config(void) {
 static void MX_NVIC_Init(void) {
   /* TIM3_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM3_IRQn, 2, 1);
-  HAL_NVIC_EnableIRQ(TIM3_IRQn);
+  HAL_NVIC_EnableIRQ (TIM3_IRQn);
   /* TIM6_DAC_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 2, 2);
-  HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
+  HAL_NVIC_EnableIRQ (TIM6_DAC_IRQn);
   /* USART6_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(USART6_IRQn, 1, 0);
-  HAL_NVIC_EnableIRQ(USART6_IRQn);
+  HAL_NVIC_EnableIRQ (USART6_IRQn);
 }
 
 /* USER CODE BEGIN 4 */
