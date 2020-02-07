@@ -22,11 +22,12 @@ class MotorController {
     this->dir_pin_ = dir_pin;
     this->pwm_timer_ = pwm_timer;
     this->pwm_channel_ = pwm_channel;
-    this->max_dutycycle_ = pwm_timer->Instance->ARR;
+    this->max_dutycycle_ = 0;
   }
 
   void setup() {
     HAL_TIM_PWM_Start(pwm_timer_, pwm_channel_);
+    this->max_dutycycle_ = pwm_timer_->Instance->ARR;
   }
 
   void set_speed(int duty_cycle) {

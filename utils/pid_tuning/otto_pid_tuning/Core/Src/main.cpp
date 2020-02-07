@@ -58,10 +58,18 @@ UART_HandleTypeDef huart6;
 
 /* USER CODE BEGIN PV */
 
+//Parameters
+float baseline = 0.3;
+int ticks_per_revolution = 148000;  //x4 resolution
+float right_wheel_circumference = 0.783;  //in meters
+float left_wheel_circumference = 0.789;  //in meters
+
 //Odometry
-Encoder right_encoder = Encoder(&htim5, RIGHT_WHEEL_CIRCUMFERENCE);
-Encoder left_encoder = Encoder(&htim2, LEFT_WHEEL_CIRCUMFERENCE);
-Odometry odom = Odometry();
+Encoder right_encoder = Encoder(&htim5, right_wheel_circumference,
+                                ticks_per_revolution);
+Encoder left_encoder = Encoder(&htim2, left_wheel_circumference,
+                               ticks_per_revolution);
+Odometry odom = Odometry(baseline);
 float left_velocity = 0;
 float right_velocity = 0;
 
