@@ -2,7 +2,6 @@
 #define MOTOR_CONTROLLER_H
 
 #include "main.h"
-#include "constants.h"
 
 class MotorController {
  public:
@@ -12,6 +11,7 @@ class MotorController {
   uint16_t dir_pin_;
   TIM_HandleTypeDef *pwm_timer_;
   uint32_t pwm_channel_;
+  int32_t max_dutycycle_;
 
   MotorController(GPIO_TypeDef *sleep_gpio_port, uint16_t sleep_pin,
                   GPIO_TypeDef *dir_gpio_port, uint16_t dir_pin,
@@ -22,6 +22,7 @@ class MotorController {
     this->dir_pin_ = dir_pin;
     this->pwm_timer_ = pwm_timer;
     this->pwm_channel_ = pwm_channel;
+    this->max_dutycycle_ = pwm_timer->Instance->ARR;
   }
 
   void setup() {
@@ -34,8 +35,8 @@ class MotorController {
       HAL_GPIO_WritePin(dir_gpio_port_, dir_pin_, GPIO_PIN_SET);
 
       //check if duty_cycle exceeds maximum
-      if (duty_cycle > MAX_DUTY_CYCLE)
-        __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, MAX_DUTY_CYCLE);
+      if (duty_cycle > max_dutycycle_)
+        __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, max_dutycycle_);
       else
         __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, duty_cycle);
 
@@ -44,8 +45,8 @@ class MotorController {
       HAL_GPIO_WritePin(dir_gpio_port_, dir_pin_, GPIO_PIN_RESET);
 
       //check if duty_cycle is lower than minimum
-      if (duty_cycle < -MAX_DUTY_CYCLE)
-        __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, MAX_DUTY_CYCLE);
+      if (duty_cycle < -max_dutycycle_)
+        __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, max_dutycycle_);
       else
         //invert sign to make duty_cycle positive
       __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, -duty_cycle);

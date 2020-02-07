@@ -22,7 +22,7 @@ class Pid {
   int min_;
   int max_;
 
-  Pid(float kp, float ki, float kd) {
+  Pid(float kp, float ki, float kd, int min, int max) {
     this->kp_ = kp;
     this->ki_ = ki;
     this->kd_ = kd;
@@ -33,12 +33,12 @@ class Pid {
     this->previous_error_ = 0;
     this->error_sum_ = 0;
 
-    this->min_ = -MAX_DUTY_CYCLE;
-    this->max_ = MAX_DUTY_CYCLE;
+    this->min_ = min;
+    this->max_ = max;
 
   }
 
-  void config(float kp, float ki, float kd) {
+  void config(float kp, float ki, float kd, int min, int max) {
     this->kp_ = kp;
     this->ki_ = ki;
     this->kd_ = kd;
@@ -48,6 +48,9 @@ class Pid {
 
     this->previous_error_ = 0;
     this->error_sum_ = 0;
+
+    this->min_ = min;
+    this->max_ = max;
 
   }
 
@@ -70,12 +73,16 @@ class Pid {
     output += (this->error_ - this->previous_error_) * kd_;
     this->previous_error_ = this->error_;
 
-    int integer_output = static_cast<int> (output);
+    int integer_output = static_cast<int>(output);
 
-//    if(integer_output > this->max_)
-//      integer_output = this->max_;
-//    else if (integer_output < this->min_)
-//      integer_output = this->min_;
+    //anti windup
+    if (integer_output > this->max_) {
+      integer_output = this->max_;
+      this->error_sum_ -= this->error_;
+    } else if (integer_output < this->min_){
+      integer_output = this->min_;
+      this->error_sum_ -= this->error_;
+    }
 
     return integer_output;
 
