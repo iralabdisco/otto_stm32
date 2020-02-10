@@ -198,7 +198,8 @@ void SystemClock_Config(void) {
   /** Configure the main internal regulator output voltage 
    */
   __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);/** Initializes the CPU, AHB and APB busses clocks
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
+  /** Initializes the CPU, AHB and APB busses clocks 
    */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
@@ -233,13 +234,13 @@ void SystemClock_Config(void) {
 static void MX_NVIC_Init(void) {
   /* TIM3_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM3_IRQn, 2, 1);
-  HAL_NVIC_EnableIRQ (TIM3_IRQn);
+  HAL_NVIC_EnableIRQ(TIM3_IRQn);
   /* TIM6_DAC_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 2, 2);
-  HAL_NVIC_EnableIRQ (TIM6_DAC_IRQn);
+  HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
   /* USART6_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(USART6_IRQn, 1, 0);
-  HAL_NVIC_EnableIRQ (USART6_IRQn);
+  HAL_NVIC_EnableIRQ(USART6_IRQn);
 }
 
 /* USER CODE BEGIN 4 */

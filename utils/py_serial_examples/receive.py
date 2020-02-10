@@ -5,7 +5,8 @@ ser = serial.Serial(
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
-        rtscts=False)
+        rtscts=False,
+        exclusive=None)
 while (ser.is_open == False):
 	try:
 		ser.port = '/dev/ttyUSB0'
