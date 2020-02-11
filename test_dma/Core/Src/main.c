@@ -105,6 +105,8 @@ int main(void)
   HAL_UART_Receive_DMA(&huart6, rx_buffer, 8);
 
   /* USER CODE END 2 */
+ 
+ 
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -250,6 +252,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 }
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   HAL_UART_Receive_DMA(&huart6, rx_buffer, 8);
+  mode++;
 }
 
 /* USER CODE END 4 */

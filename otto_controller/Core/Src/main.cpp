@@ -20,7 +20,6 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "dma.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -142,7 +141,7 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-  MX_DMA_Init();
+  MX_GPIO_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
@@ -175,9 +174,11 @@ int main(void)
   rx_buffer = (uint8_t*) &vel_msg;
 
   //Enables UART RX interrupt
-  HAL_UART_Receive_DMA(&huart6, rx_buffer, 8);
+  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
 
   /* USER CODE END 2 */
+ 
+ 
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -304,7 +305,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   //Blue user button on the NUCLEO board
   if (GPIO_Pin == GPIO_PIN_13) {
-    mode++;
     if (mode == 0) {
       mode = 1;
       //Enables TIM3 interrupt (used for PID control)
