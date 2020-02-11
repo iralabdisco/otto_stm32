@@ -33,4 +33,4 @@ while 1:
   print(encode_buffer)
   ser.write(encode_buffer)
   ser.reset_output_buffer()
-  time.sleep(0.005)
+  time.sleep(0.5)

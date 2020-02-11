@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import rospy, serial, struct, time
-import otto_communication_pb2
 from geometry_msgs.msg import Twist
 from serial import SerialException
 
@@ -15,14 +14,10 @@ ser = serial.Serial(
 def callback(data):
     linear = -data.linear.x
     angular = -data.angular.z      #da fixare?
-    my_velocity = otto_communication_pb2.VelocityCommand()
-    my_velocity.linear_velocity = linear;
-    my_velocity.angular_velocity = angular;
     rospy.loginfo('I heard %f %f', linear, angular)
-    out_buffer = my_velocity.SerializeToString()
-    ser.write(out_buffer)
+    msg_output = struct.pack('<ff', linear, angular)
+    ser.write(msg_output)
     ser.reset_output_buffer()
-    time.sleep(0.001)
     #ser.flush()
     
 

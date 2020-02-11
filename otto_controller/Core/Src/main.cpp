@@ -104,7 +104,7 @@ uint8_t *rx_buffer;
 velocity_msg vel_msg;
 wheel_msg wheels_msg;
 
-uint8_t mode = 0;  //setup mode
+int mode = 0;  //setup mode
 
 uint8_t proto_buffer_rx[50];
 pb_istream_t in_pb_stream;
@@ -315,30 +315,35 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 
+  mode++;
+
   float linear_velocity;
   float angular_velocity;
 
-  pb_istream_t stream = pb_istream_from_buffer(proto_buffer_rx, velocity_cmd_length);
+  pb_istream_t stream = pb_istream_from_buffer(proto_buffer_rx,
+                                               velocity_cmd_length);
 
   /* Now we are ready to decode the message. */
   bool status = pb_decode(&stream, VelocityCommand_fields, &vel_cmd);
 
-  linear_velocity = vel_cmd.linear_velocity;
-  angular_velocity = vel_cmd.angular_velocity;
+  if (status) {
+    linear_velocity = vel_cmd.linear_velocity;
+    angular_velocity = vel_cmd.angular_velocity;
 
-  odom.UpdateValues(linear_velocity, angular_velocity);
+    odom.UpdateValues(linear_velocity, angular_velocity);
 
-  float left_setpoint = odom.GetLeftVelocity();
-  float right_setpoint = odom.GetRightVelocity();
+    float left_setpoint = odom.GetLeftVelocity();
+    float right_setpoint = odom.GetRightVelocity();
 
-  left_pid.set(left_setpoint);
-  right_pid.set(right_setpoint);
+    left_pid.set(left_setpoint);
+    right_pid.set(right_setpoint);
 
-  float cross_setpoint = left_setpoint - right_setpoint;
-  cross_pid.set(cross_setpoint);
+    float cross_setpoint = left_setpoint - right_setpoint;
+    cross_pid.set(cross_setpoint);
+  }
 
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
-                         velocity_cmd_length);
+                       velocity_cmd_length);
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
