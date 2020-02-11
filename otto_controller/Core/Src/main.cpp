@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dma.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -142,6 +143,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
@@ -174,7 +176,7 @@ int main(void)
   rx_buffer = (uint8_t*) &vel_msg;
 
   //Enables UART RX interrupt
-  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
+  HAL_UART_Receive_DMA(&huart6, rx_buffer, 8);
 
   /* USER CODE END 2 */
  
@@ -298,7 +300,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   float cross_setpoint = left_setpoint - right_setpoint;
   cross_pid.set(cross_setpoint);
 
-  HAL_UART_Receive_IT(&huart6, rx_buffer, 8);
+  HAL_UART_Receive_DMA(&huart6, rx_buffer, 8);
 
 }
 
