@@ -18,7 +18,10 @@ typedef enum _VelocityCommand_Status {
     VelocityCommand_Status_UNKNOWN = 0,
     VelocityCommand_Status_WAITING_CONFIG = 1,
     VelocityCommand_Status_READY = 2,
-    VelocityCommand_Status_RUNNING = 3
+    VelocityCommand_Status_RUNNING = 3,
+    VelocityCommand_Status_H_BRIDGE_FAULT_1 = 4,
+    VelocityCommand_Status_H_BRIDGE_FAULT_2 = 5,
+    VelocityCommand_Status_UNKNOWN_ERROR = 6
 } VelocityCommand_Status;
 
 /* Struct definitions */
@@ -32,8 +35,8 @@ typedef struct _VelocityCommand {
 
 /* Helper constants for enums */
 #define _VelocityCommand_Status_MIN VelocityCommand_Status_UNKNOWN
-#define _VelocityCommand_Status_MAX VelocityCommand_Status_RUNNING
-#define _VelocityCommand_Status_ARRAYSIZE ((VelocityCommand_Status)(VelocityCommand_Status_RUNNING+1))
+#define _VelocityCommand_Status_MAX VelocityCommand_Status_UNKNOWN_ERROR
+#define _VelocityCommand_Status_ARRAYSIZE ((VelocityCommand_Status)(VelocityCommand_Status_UNKNOWN_ERROR+1))
 
 
 /* Initializer values for message structs */

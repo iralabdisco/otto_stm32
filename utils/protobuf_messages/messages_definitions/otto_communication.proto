@@ -1,0 +1,42 @@
+syntax = "proto2";
+ 
+message StatusMessage {
+  required float linear_velocity = 1;
+  required float angular_velocity = 2;
+  required fixed64 delta_millis = 3;
+  enum Status {
+    UNKNOWN = 0;
+    WAITING_CONFIG = 1;
+    READY = 2;
+    RUNNING = 3;
+    H_BRIDGE_FAULT_1 = 4;
+    H_BRIDGE_FAULT_2 = 5;
+    UNKNOWN_ERROR = 6;
+  }
+  required Status status = 4;
+}
+
+message ConfigCommand {
+  required float left_kp = 1;
+  required float left_ki = 2;
+  required float left_kd = 3;
+
+  required float right_kp = 4;
+  required float right_ki = 5;
+  required float right_kd = 6;
+
+  required float cross_kp = 7;
+  required float cross_ki = 8;
+  required float cross_kd = 9;
+
+  required float baseline = 10;
+  
+  required fixed32 ticks_per_revolution = 11;
+  required float right_wheel_circumference = 12;
+  required float left_wheel_circumference = 13;
+}
+
+message VelocityCommand {
+  required float linear_velocity = 1;
+  required float angular_velocity = 2;
+}

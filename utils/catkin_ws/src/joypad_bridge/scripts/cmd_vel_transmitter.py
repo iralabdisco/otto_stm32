@@ -6,7 +6,7 @@ from serial import SerialException
 
 ser = serial.Serial(
         baudrate=115200,
-        parity=serial.PARITY_ODD,
+        parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
         rtscts=False)
@@ -17,7 +17,8 @@ def callback(data):
     rospy.loginfo('I heard %f %f', linear, angular)
     msg_output = struct.pack('<ff', linear, angular)
     ser.write(msg_output)
-    ser.flush()
+    ser.reset_output_buffer()
+    #ser.flush()
     
 
 

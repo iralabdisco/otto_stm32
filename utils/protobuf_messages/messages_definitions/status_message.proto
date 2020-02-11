@@ -1,14 +1,17 @@
 syntax = "proto3";
-
-message VelocityCommand {
-  float linear_velocity = 1;
-  float angular_velocity = 2;
-  fixed64 delta_millis = 3;
+ 
+message StatusMessage {
+  required float linear_velocity = 1;
+  required float angular_velocity = 2;
+  required fixed64 delta_millis = 3;
   enum Status {
     UNKNOWN = 0;
     WAITING_CONFIG = 1;
     READY = 2;
     RUNNING = 3;
+    H_BRIDGE_FAULT_1 = 4;
+    H_BRIDGE_FAULT_2 = 5;
+    UNKNOWN_ERROR = 6;
   }
-  Status status = 4;
+  required Status status = 4;
 }

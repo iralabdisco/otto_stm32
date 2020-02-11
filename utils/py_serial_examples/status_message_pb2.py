@@ -18,16 +18,16 @@ _sym_db = _symbol_database.Default()
 DESCRIPTOR = _descriptor.FileDescriptor(
   name='status_message.proto',
   package='',
-  syntax='proto3',
-  serialized_pb=_b('\n\x14status_message.proto\"\x86\x02\n\x0fVelocityCommand\x12\x17\n\x0flinear_velocity\x18\x01 \x01(\x02\x12\x18\n\x10\x61ngular_velocity\x18\x02 \x01(\x02\x12\x14\n\x0c\x64\x65lta_millis\x18\x03 \x01(\x06\x12\'\n\x06status\x18\x04 \x01(\x0e\x32\x17.VelocityCommand.Status\"\x80\x01\n\x06Status\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x12\n\x0eWAITING_CONFIG\x10\x01\x12\t\n\x05READY\x10\x02\x12\x0b\n\x07RUNNING\x10\x03\x12\x14\n\x10H_BRIDGE_FAULT_1\x10\x04\x12\x14\n\x10H_BRIDGE_FAULT_2\x10\x05\x12\x11\n\rUNKNOWN_ERROR\x10\x06\x62\x06proto3')
+  syntax='proto2',
+  serialized_pb=_b('\n\x14status_message.proto\"\x82\x02\n\rStatusMessage\x12\x17\n\x0flinear_velocity\x18\x01 \x02(\x02\x12\x18\n\x10\x61ngular_velocity\x18\x02 \x02(\x02\x12\x14\n\x0c\x64\x65lta_millis\x18\x03 \x02(\x06\x12%\n\x06status\x18\x04 \x02(\x0e\x32\x15.StatusMessage.Status\"\x80\x01\n\x06Status\x12\x0b\n\x07UNKNOWN\x10\x00\x12\x12\n\x0eWAITING_CONFIG\x10\x01\x12\t\n\x05READY\x10\x02\x12\x0b\n\x07RUNNING\x10\x03\x12\x14\n\x10H_BRIDGE_FAULT_1\x10\x04\x12\x14\n\x10H_BRIDGE_FAULT_2\x10\x05\x12\x11\n\rUNKNOWN_ERROR\x10\x06')
 )
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 
 
-_VELOCITYCOMMAND_STATUS = _descriptor.EnumDescriptor(
+_STATUSMESSAGE_STATUS = _descriptor.EnumDescriptor(
   name='Status',
-  full_name='VelocityCommand.Status',
+  full_name='StatusMessage.Status',
   filename=None,
   file=DESCRIPTOR,
   values=[
@@ -62,43 +62,43 @@ _VELOCITYCOMMAND_STATUS = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   options=None,
-  serialized_start=159,
-  serialized_end=287,
+  serialized_start=155,
+  serialized_end=283,
 )
-_sym_db.RegisterEnumDescriptor(_VELOCITYCOMMAND_STATUS)
+_sym_db.RegisterEnumDescriptor(_STATUSMESSAGE_STATUS)
 
 
-_VELOCITYCOMMAND = _descriptor.Descriptor(
-  name='VelocityCommand',
-  full_name='VelocityCommand',
+_STATUSMESSAGE = _descriptor.Descriptor(
+  name='StatusMessage',
+  full_name='StatusMessage',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='linear_velocity', full_name='VelocityCommand.linear_velocity', index=0,
-      number=1, type=2, cpp_type=6, label=1,
+      name='linear_velocity', full_name='StatusMessage.linear_velocity', index=0,
+      number=1, type=2, cpp_type=6, label=2,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='angular_velocity', full_name='VelocityCommand.angular_velocity', index=1,
-      number=2, type=2, cpp_type=6, label=1,
+      name='angular_velocity', full_name='StatusMessage.angular_velocity', index=1,
+      number=2, type=2, cpp_type=6, label=2,
       has_default_value=False, default_value=float(0),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='delta_millis', full_name='VelocityCommand.delta_millis', index=2,
-      number=3, type=6, cpp_type=4, label=1,
+      name='delta_millis', full_name='StatusMessage.delta_millis', index=2,
+      number=3, type=6, cpp_type=4, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       options=None),
     _descriptor.FieldDescriptor(
-      name='status', full_name='VelocityCommand.status', index=3,
-      number=4, type=14, cpp_type=8, label=1,
+      name='status', full_name='StatusMessage.status', index=3,
+      number=4, type=14, cpp_type=8, label=2,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -108,28 +108,28 @@ _VELOCITYCOMMAND = _descriptor.Descriptor(
   ],
   nested_types=[],
   enum_types=[
-    _VELOCITYCOMMAND_STATUS,
+    _STATUSMESSAGE_STATUS,
   ],
   options=None,
   is_extendable=False,
-  syntax='proto3',
+  syntax='proto2',
   extension_ranges=[],
   oneofs=[
   ],
   serialized_start=25,
-  serialized_end=287,
+  serialized_end=283,
 )
 
-_VELOCITYCOMMAND.fields_by_name['status'].enum_type = _VELOCITYCOMMAND_STATUS
-_VELOCITYCOMMAND_STATUS.containing_type = _VELOCITYCOMMAND
-DESCRIPTOR.message_types_by_name['VelocityCommand'] = _VELOCITYCOMMAND
+_STATUSMESSAGE.fields_by_name['status'].enum_type = _STATUSMESSAGE_STATUS
+_STATUSMESSAGE_STATUS.containing_type = _STATUSMESSAGE
+DESCRIPTOR.message_types_by_name['StatusMessage'] = _STATUSMESSAGE
 
-VelocityCommand = _reflection.GeneratedProtocolMessageType('VelocityCommand', (_message.Message,), dict(
-  DESCRIPTOR = _VELOCITYCOMMAND,
+StatusMessage = _reflection.GeneratedProtocolMessageType('StatusMessage', (_message.Message,), dict(
+  DESCRIPTOR = _STATUSMESSAGE,
   __module__ = 'status_message_pb2'
-  # @@protoc_insertion_point(class_scope:VelocityCommand)
+  # @@protoc_insertion_point(class_scope:StatusMessage)
   ))
-_sym_db.RegisterMessage(VelocityCommand)
+_sym_db.RegisterMessage(StatusMessage)
 
 
 # @@protoc_insertion_point(module_scope)
