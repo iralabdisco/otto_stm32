@@ -33,6 +33,11 @@
 #include "motor_controller.h"
 #include "pid.h"
 #include "communication_utils.h"
+
+#include "pb_encode.h"
+#include "pb_decode.h"
+#include "otto_communication.pb.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -101,6 +106,20 @@ wheel_msg wheels_msg;
 
 uint8_t mode = 0;  //setup mode
 
+uint8_t proto_buffer_rx[50];
+pb_istream_t in_pb_stream;
+
+VelocityCommand vel_cmd;
+size_t velocity_cmd_length;
+bool rx_status;
+
+uint8_t proto_buffer_tx[100];
+pb_ostream_t out_pb_stream;
+
+StatusMessage status_msg;
+size_t status_msg_length;
+bool tx_status;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -116,14 +135,12 @@ static void MX_NVIC_Init(void);
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
+ * @brief  The application entry point.
+ * @retval int
+ */
+int main(void) {
   /* USER CODE BEGIN 1 */
   /* USER CODE END 1 */
-  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -175,12 +192,25 @@ int main(void)
   tx_buffer = (uint8_t*) &wheels_msg;
   rx_buffer = (uint8_t*) &vel_msg;
 
+  //proto stuff
+
+  vel_cmd = VelocityCommand_init_zero;
+  status_msg = StatusMessage_init_zero;
+
+  in_pb_stream = pb_istream_from_buffer(proto_buffer_rx,
+                                        sizeof(proto_buffer_rx));
+  out_pb_stream = pb_ostream_from_buffer(proto_buffer_tx,
+                                         sizeof(proto_buffer_tx));
+
+  pb_encode(&out_pb_stream, VelocityCommand_fields, &vel_cmd);
+
+  velocity_cmd_length = out_pb_stream.bytes_written;
+
   //Enables UART RX interrupt
-  HAL_UART_Receive_DMA(&huart6, rx_buffer, 8);
+  HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
+                       velocity_cmd_length);
 
   /* USER CODE END 2 */
- 
- 
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -193,56 +223,51 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+ * @brief System Clock Configuration
+ * @retval None
+ */
+void SystemClock_Config(void) {
+  RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = { 0 };
 
   /** Configure the main internal regulator output voltage 
-  */
+   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
   /** Initializes the CPU, AHB and APB busses clocks 
-  */
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     Error_Handler();
   }
   /** Initializes the CPU, AHB and APB busses clocks 
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+      | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) {
     Error_Handler();
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART6;
   PeriphClkInitStruct.Usart6ClockSelection = RCC_USART6CLKSOURCE_PCLK2;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-  {
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
     Error_Handler();
   }
 }
 
 /**
-  * @brief NVIC Configuration.
-  * @retval None
-  */
-static void MX_NVIC_Init(void)
-{
+ * @brief NVIC Configuration.
+ * @retval None
+ */
+static void MX_NVIC_Init(void) {
   /* TIM3_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM3_IRQn, 2, 1);
   HAL_NVIC_EnableIRQ(TIM3_IRQn);
@@ -289,7 +314,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
-  odom.UpdateValues(vel_msg.linear_velocity, vel_msg.angular_velocity);
+
+  float linear_velocity;
+  float angular_velocity;
+
+  pb_istream_t stream = pb_istream_from_buffer(proto_buffer_rx, velocity_cmd_length);
+
+  /* Now we are ready to decode the message. */
+  bool status = pb_decode(&stream, VelocityCommand_fields, &vel_cmd);
+
+  linear_velocity = vel_cmd.linear_velocity;
+  angular_velocity = vel_cmd.angular_velocity;
+
+  odom.UpdateValues(linear_velocity, angular_velocity);
 
   float left_setpoint = odom.GetLeftVelocity();
   float right_setpoint = odom.GetRightVelocity();
@@ -300,8 +337,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   float cross_setpoint = left_setpoint - right_setpoint;
   cross_pid.set(cross_setpoint);
 
-  HAL_UART_Receive_DMA(&huart6, rx_buffer, 8);
-
+  HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
+                         velocity_cmd_length);
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
@@ -321,11 +358,10 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void) {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
 
