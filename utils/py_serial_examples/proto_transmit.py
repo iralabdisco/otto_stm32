@@ -21,8 +21,8 @@ print("open port")
 
 otto = otto_communication_pb2.StatusMessage()
 otto.linear_velocity = 0.3
-otto.angular_velocity = 0.5
-otto.delta_millis = 1000
+otto.angular_velocity = 0.0
+otto.delta_millis = 500
 otto.status = otto_communication_pb2.StatusMessage.Status.RUNNING
 
 encode_buffer = otto.SerializeToString()
