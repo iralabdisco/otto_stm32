@@ -119,6 +119,7 @@ pb_ostream_t out_pb_stream;
 StatusMessage status_msg;
 size_t status_msg_length;
 bool tx_status;
+float previous_tx_millis;
 
 /* USER CODE END PV */
 
@@ -203,8 +204,10 @@ int main(void) {
                                          sizeof(proto_buffer_tx));
 
   pb_encode(&out_pb_stream, VelocityCommand_fields, &vel_cmd);
-
   velocity_cmd_length = out_pb_stream.bytes_written;
+
+  pb_encode(&out_pb_stream, StatusMessage_fields, &status_msg);
+  status_msg_length = out_pb_stream.bytes_written;
 
   //Enables UART RX interrupt
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
@@ -299,17 +302,30 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     left_dutycycle += cross_dutycycle;
     right_dutycycle -= cross_dutycycle;
-
-    wheels_msg.left_vel = left_velocity;
-    wheels_msg.right_vel = right_velocity;
-
   }
 
   //TIMER 2Hz Transmit
   if (htim->Instance == TIM6) {
 
     //TODO odometry
-    HAL_UART_Transmit_IT(&huart6, tx_buffer, 8);
+
+    pb_ostream_t stream = pb_ostream_from_buffer(proto_buffer_tx, sizeof(proto_buffer_tx));
+
+    odom.FromWheelVelToOdom(left_velocity, right_velocity);
+
+    status_msg.linear_velocity = odom.GetLinearVelocity();
+    status_msg.angular_velocity = odom.GetAngularVelocity();
+
+    float current_tx_millis = HAL_GetTick();
+    status_msg.delta_millis = current_tx_millis - previous_tx_millis;
+    previous_tx_millis = current_tx_millis;
+
+    status_msg.status = StatusMessage_Status_RUNNING;
+
+    pb_encode(&stream, StatusMessage_fields, &status_msg);
+
+    HAL_UART_Transmit_DMA(&huart6,(uint8_t*) &proto_buffer_tx, status_msg_length);
+//    HAL_UART_Transmit(&huart6,(uint8_t*) &proto_buffer_tx, status_msg_length, 100);
   }
 }
 
@@ -323,14 +339,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   pb_istream_t stream = pb_istream_from_buffer(proto_buffer_rx,
                                                velocity_cmd_length);
 
-  /* Now we are ready to decode the message. */
   bool status = pb_decode(&stream, VelocityCommand_fields, &vel_cmd);
 
   if (status) {
     linear_velocity = vel_cmd.linear_velocity;
     angular_velocity = vel_cmd.angular_velocity;
 
-    odom.UpdateValues(linear_velocity, angular_velocity);
+    odom.FromCmdVelToSetpoint(linear_velocity, angular_velocity);
 
     float left_setpoint = odom.GetLeftVelocity();
     float right_setpoint = odom.GetRightVelocity();

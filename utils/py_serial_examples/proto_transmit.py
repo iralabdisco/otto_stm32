@@ -19,18 +19,18 @@ while (ser.is_open == False):
 
 print("open port")
 
-my_velocity = otto_communication_pb2.VelocityCommand()
-my_velocity.linear_velocity = 0.3
-my_velocity.angular_velocity = 0.0
-encode_buffer = my_velocity.SerializeToString()
+otto = otto_communication_pb2.StatusMessage()
+otto.linear_velocity = 0.3
+otto.angular_velocity = 0.5
+otto.delta_millis = 1000
+otto.status = otto_communication_pb2.StatusMessage.Status.RUNNING
+
+encode_buffer = otto.SerializeToString()
 print(encode_buffer)
 print(len(encode_buffer))
 
 while 1:
-  my_velocity.linear_velocity = my_velocity.linear_velocity + 0.01
-  encode_buffer = my_velocity.SerializeToString()
-  print(my_velocity)
-  print(encode_buffer)
   ser.write(encode_buffer)
   ser.reset_output_buffer()
+  print(encode_buffer)
   time.sleep(0.005)

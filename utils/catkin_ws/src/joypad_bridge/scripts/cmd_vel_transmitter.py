@@ -10,7 +10,8 @@ ser = serial.Serial(
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
-        rtscts=False)
+        rtscts=False,
+        exclusive=None)
 
 def callback(data):
     linear = -data.linear.x
@@ -23,10 +24,7 @@ def callback(data):
     ser.write(out_buffer)
     ser.reset_output_buffer()
     time.sleep(0.001)
-    #ser.flush()
     
-
-
 def listener():
     while(ser.is_open == False):
         try:
