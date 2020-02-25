@@ -1,6 +1,7 @@
 <launch>
+  <!-- Used to transmit and receive from serial -->
+  <include file="serial_bridge.launch" />
+  
   <node name="joy_node" pkg="joy" type="joy_node" />
   <node name="joy_to_cmd_vel" pkg="joypad_bridge" type="joy_to_cmd_vel.py"/>
-  <node name="cmd_vel_transmitter" pkg="joypad_bridge" type="cmd_vel_transmitter.py" output="screen"/>
-  <node name="serial_receiver" pkg="joypad_bridge" type="serial_receiver.py"/>
 </launch>
