@@ -39,10 +39,10 @@ def serial_receiver():
     odom_broadcaster = tf.TransformBroadcaster()
 
     otto_status = otto_communication_pb2.StatusMessage()
-    otto_status.linear_velocity = 7
-    otto_status.angular_velocity = 7
-    otto_status.delta_millis = 7
-    otto_status.status = otto_communication_pb2.StatusMessage.Status.RUNNING
+    otto_status.linear_velocity = 0
+    otto_status.angular_velocity = 0
+    otto_status.delta_millis = 0
+    otto_status.status = 0
 
     encoded_buffer = otto_status.SerializeToString()
 
@@ -56,14 +56,14 @@ def serial_receiver():
     radius = 0;
 
     while (not rospy.is_shutdown()):
-        start = datetime.datetime.now()
-        encoded_buffer = ser.read(31)
+        ser.reset_input_buffer()
+        encoded_buffer = ser.read(status_length)
         
         try:
             otto_status.ParseFromString(encoded_buffer)
             print(otto_status)
             
-            if (otto_status.status == otto_communication_pb2.StatusMessage.Status.RUNNING):
+            if (otto_status.status == 3):
                 lin_vel = otto_status.linear_velocity
                 ang_vel = otto_status.angular_velocity
                 d_time = otto_status.delta_millis
@@ -110,11 +110,6 @@ def serial_receiver():
         except DecodeError:
             print("Decode Error")
             ser.reset_input_buffer()
-            
-        end = datetime.datetime.now()
-        delta = end - start
-        delta = (delta.total_seconds()*1000)
-        print(delta)
 
 
 if __name__ == '__main__':

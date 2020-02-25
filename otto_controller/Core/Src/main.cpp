@@ -205,27 +205,14 @@ int main(void)
   vel_cmd = VelocityCommand_init_zero;
   status_msg = StatusMessage_init_zero;
 
-  in_pb_stream = pb_istream_from_buffer(proto_buffer_rx,
-                                        sizeof(proto_buffer_rx));
-  out_pb_stream = pb_ostream_from_buffer(proto_buffer_tx,
-                                         sizeof(proto_buffer_tx));
-
-  pb_encode(&out_pb_stream, VelocityCommand_fields, &vel_cmd);
-  velocity_cmd_length = out_pb_stream.bytes_written;
-
-  pb_encode(&out_pb_stream, StatusMessage_fields, &status_msg);
-  status_msg_length = out_pb_stream.bytes_written;
-
   //Enables TIM6 interrupt (used for periodic transmission of the odometry)
   HAL_TIM_Base_Start_IT(&htim6);
 
   //Enables UART RX interrupt
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
-                       velocity_cmd_length);
+                       VelocityCommand_size);
 
   /* USER CODE END 2 */
- 
- 
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -338,11 +325,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     status_msg.delta_millis = current_tx_millis - previous_tx_millis;
     previous_tx_millis = current_tx_millis;
 
-    status_msg.status = StatusMessage_Status_RUNNING;
+    status_msg.status = 3;
 
     pb_encode(&stream, StatusMessage_fields, &status_msg);
 
-    HAL_UART_Transmit_DMA(&huart6,(uint8_t*) &proto_buffer_tx, status_msg_length);
+    HAL_UART_Transmit_DMA(&huart6,(uint8_t*) &proto_buffer_tx, StatusMessage_size);
   }
 }
 
@@ -362,7 +349,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   float angular_velocity;
 
   pb_istream_t stream = pb_istream_from_buffer(proto_buffer_rx,
-                                               velocity_cmd_length);
+                                               VelocityCommand_size);
 
   bool status = pb_decode(&stream, VelocityCommand_fields, &vel_cmd);
 
@@ -389,7 +376,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   }
 
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
-                       velocity_cmd_length);
+                       VelocityCommand_size);
 
   end_time = HAL_GetTick();
   time_diff = end_time - start_time;

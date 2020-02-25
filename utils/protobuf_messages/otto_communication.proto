@@ -21,6 +21,7 @@ message StatusMessage {
   required fixed32 status = 4;
 }
 
+// Message sent from the computer to ST board
 message ConfigCommand {
   required float left_kp = 1;
   required float left_ki = 2;
@@ -41,6 +42,7 @@ message ConfigCommand {
   required float left_wheel_circumference = 13;
 }
 
+// Message sent from the computer to ST board
 message VelocityCommand {
   required float linear_velocity = 1;
   required float angular_velocity = 2;

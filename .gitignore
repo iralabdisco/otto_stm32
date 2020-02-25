@@ -68,3 +68,5 @@ lib/
 msg_gen/
 srv_gen/
 
+#Py cache
+*.pyc

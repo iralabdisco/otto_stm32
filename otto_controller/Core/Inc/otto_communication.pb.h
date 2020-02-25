@@ -13,17 +13,6 @@
 extern "C" {
 #endif
 
-/* Enum definitions */
-typedef enum _StatusMessage_Status {
-    StatusMessage_Status_UNKNOWN = 0,
-    StatusMessage_Status_WAITING_CONFIG = 1,
-    StatusMessage_Status_READY = 2,
-    StatusMessage_Status_RUNNING = 3,
-    StatusMessage_Status_H_BRIDGE_FAULT_1 = 4,
-    StatusMessage_Status_H_BRIDGE_FAULT_2 = 5,
-    StatusMessage_Status_UNKNOWN_ERROR = 6
-} StatusMessage_Status;
-
 /* Struct definitions */
 typedef struct _ConfigCommand {
     float left_kp;
@@ -44,8 +33,8 @@ typedef struct _ConfigCommand {
 typedef struct _StatusMessage {
     float linear_velocity;
     float angular_velocity;
-    uint64_t delta_millis;
-    StatusMessage_Status status;
+    uint32_t delta_millis;
+    uint32_t status;
 } StatusMessage;
 
 typedef struct _VelocityCommand {
@@ -54,17 +43,11 @@ typedef struct _VelocityCommand {
 } VelocityCommand;
 
 
-/* Helper constants for enums */
-#define _StatusMessage_Status_MIN StatusMessage_Status_UNKNOWN
-#define _StatusMessage_Status_MAX StatusMessage_Status_UNKNOWN_ERROR
-#define _StatusMessage_Status_ARRAYSIZE ((StatusMessage_Status)(StatusMessage_Status_UNKNOWN_ERROR+1))
-
-
 /* Initializer values for message structs */
-#define StatusMessage_init_default               {0, 0, 0, _StatusMessage_Status_MIN}
+#define StatusMessage_init_default               {0, 0, 0, 0}
 #define ConfigCommand_init_default               {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 #define VelocityCommand_init_default             {0, 0}
-#define StatusMessage_init_zero                  {0, 0, 0, _StatusMessage_Status_MIN}
+#define StatusMessage_init_zero                  {0, 0, 0, 0}
 #define ConfigCommand_init_zero                  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 #define VelocityCommand_init_zero                {0, 0}
 
@@ -93,8 +76,8 @@ typedef struct _VelocityCommand {
 #define StatusMessage_FIELDLIST(X, a) \
 X(a, STATIC,   REQUIRED, FLOAT,    linear_velocity,   1) \
 X(a, STATIC,   REQUIRED, FLOAT,    angular_velocity,   2) \
-X(a, STATIC,   REQUIRED, FIXED64,  delta_millis,      3) \
-X(a, STATIC,   REQUIRED, UENUM,    status,            4)
+X(a, STATIC,   REQUIRED, FIXED32,  delta_millis,      3) \
+X(a, STATIC,   REQUIRED, FIXED32,  status,            4)
 #define StatusMessage_CALLBACK NULL
 #define StatusMessage_DEFAULT NULL
 
@@ -131,7 +114,7 @@ extern const pb_msgdesc_t VelocityCommand_msg;
 #define VelocityCommand_fields &VelocityCommand_msg
 
 /* Maximum encoded size of messages (where known) */
-#define StatusMessage_size                       21
+#define StatusMessage_size                       20
 #define ConfigCommand_size                       65
 #define VelocityCommand_size                     10
 
