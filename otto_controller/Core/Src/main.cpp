@@ -121,6 +121,11 @@ size_t status_msg_length;
 bool tx_status;
 float previous_tx_millis;
 
+//TEST variables
+long start_time;
+long end_time;
+int time_diff;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -210,6 +215,9 @@ int main(void)
 
   pb_encode(&out_pb_stream, StatusMessage_fields, &status_msg);
   status_msg_length = out_pb_stream.bytes_written;
+
+  //Enables TIM6 interrupt (used for periodic transmission of the odometry)
+  HAL_TIM_Base_Start_IT(&htim6);
 
   //Enables UART RX interrupt
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
@@ -313,14 +321,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     right_dutycycle -= cross_dutycycle;
   }
 
-  //TIMER 2Hz Transmit
+  //TIMER 10Hz Transmit
   if (htim->Instance == TIM6) {
-
-    //TODO odometry
 
     pb_ostream_t stream = pb_ostream_from_buffer(proto_buffer_tx, sizeof(proto_buffer_tx));
 
-    odom.FromWheelVelToOdom(left_velocity, right_velocity);
+    float left_wheel = left_encoder.GetLinearVelocity();
+    float right_wheel = right_encoder.GetLinearVelocity();
+
+    odom.FromWheelVelToOdom(1, -1);
 
     status_msg.linear_velocity = odom.GetLinearVelocity();
     status_msg.angular_velocity = odom.GetAngularVelocity();
@@ -334,13 +343,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     pb_encode(&stream, StatusMessage_fields, &status_msg);
 
     HAL_UART_Transmit_DMA(&huart6,(uint8_t*) &proto_buffer_tx, status_msg_length);
-//    HAL_UART_Transmit(&huart6,(uint8_t*) &proto_buffer_tx, status_msg_length, 100);
   }
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 
-  mode++;
+  start_time = HAL_GetTick();
+
+//  size_t buffer_size = sizeof(proto_buffer_rx);
+//  uint8_t buffer_copy[buffer_size];
+//  memcpy((void *) &buffer_copy, &proto_buffer_rx, buffer_size);
+//
+//  HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
+//                         velocity_cmd_length);
+//  mode++;
 
   float linear_velocity;
   float angular_velocity;
@@ -359,15 +375,24 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
     float left_setpoint = odom.GetLeftVelocity();
     float right_setpoint = odom.GetRightVelocity();
 
-    left_pid.set(left_setpoint);
-    right_pid.set(right_setpoint);
+//    left_pid.set(left_setpoint);
+//    right_pid.set(right_setpoint);
+
+    left_pid.set(0);
+    right_pid.set(0);
 
     float cross_setpoint = left_setpoint - right_setpoint;
-    cross_pid.set(cross_setpoint);
+//    cross_pid.set(cross_setpoint);
+
+    cross_pid.set(0);
+
   }
 
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
                        velocity_cmd_length);
+
+  end_time = HAL_GetTick();
+  time_diff = end_time - start_time;
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
@@ -377,8 +402,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
       mode = 1;
       //Enables TIM3 interrupt (used for PID control)
       HAL_TIM_Base_Start_IT(&htim3);
-      //Enables TIM6 interrupt (used for periodic transmission)
-      HAL_TIM_Base_Start_IT(&htim6);
 
     }
 

@@ -6,7 +6,7 @@ from geometry_msgs.msg import Twist
 from serial import SerialException
 
 ser = serial.Serial(
-        baudrate=115200,
+        baudrate=9600,
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
@@ -21,9 +21,10 @@ def callback(data):
     my_velocity.angular_velocity = angular;
     rospy.loginfo('I heard %f %f', linear, angular)
     out_buffer = my_velocity.SerializeToString()
+    print(len(out_buffer))
     ser.write(out_buffer)
     ser.reset_output_buffer()
-    time.sleep(0.001)
+    time.sleep(0.002)
     
 def listener():
     while(ser.is_open == False):

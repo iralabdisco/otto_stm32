@@ -3,4 +3,5 @@
 	  <param name="port" value="/dev/ttyUSB1" />
   </node>
   <node name="cmd_vel_transmitter" pkg="joypad_bridge" type="cmd_vel_transmitter.py" output="screen"/>
+  <node name="serial_receiver" pkg="joypad_bridge" type="serial_receiver.py"/>
 </launch>
