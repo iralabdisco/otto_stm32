@@ -47,14 +47,12 @@ def serial_receiver():
     encoded_buffer = otto_status.SerializeToString()
 
     status_length = len(encoded_buffer)
-    print (status_length)
 
     odom_values = numpy.array([0,0,0]) #x, y, th
     icc_x = 0;current_time = rospy.Time.now()
-
     icc_y = 0;
     radius = 0;
-
+    
     while (not rospy.is_shutdown()):
         ser.reset_input_buffer()
         encoded_buffer = ser.read(status_length)

@@ -28,15 +28,14 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "encoder.h"
-#include "odometry.h"
-#include "motor_controller.h"
-#include "pid.h"
-#include "communication_utils.h"
+#include "control/encoder.h"
+#include "control/odometry.h"
+#include "control/motor_controller.h"
+#include "control/pid.h"
 
-#include "pb_encode.h"
-#include "pb_decode.h"
-#include "otto_communication.pb.h"
+#include "protobuf/otto_communication.pb.h"
+#include "protobuf/pb_encode.h"
+#include "protobuf/pb_decode.h"
 
 /* USER CODE END Includes */
 
@@ -98,12 +97,6 @@ sleep2_Pin,
                            &htim4, TIM_CHANNEL_3);
 
 //Communication
-uint8_t *tx_buffer;
-uint8_t *rx_buffer;
-
-velocity_msg vel_msg;
-wheel_msg wheels_msg;
-
 int mode = 0;  //setup mode
 
 uint8_t proto_buffer_rx[50];
@@ -120,11 +113,6 @@ StatusMessage status_msg;
 size_t status_msg_length;
 bool tx_status;
 float previous_tx_millis;
-
-//TEST variables
-long start_time;
-long end_time;
-int time_diff;
 
 /* USER CODE END PV */
 
@@ -197,11 +185,7 @@ int main(void)
   left_motor.coast();
   right_motor.coast();
 
-  tx_buffer = (uint8_t*) &wheels_msg;
-  rx_buffer = (uint8_t*) &vel_msg;
-
-  //proto stuff
-
+  //protobuffer messages init
   vel_cmd = VelocityCommand_init_zero;
   status_msg = StatusMessage_init_zero;
 
@@ -334,9 +318,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
-
-  start_time = HAL_GetTick();
-
 //  size_t buffer_size = sizeof(proto_buffer_rx);
 //  uint8_t buffer_copy[buffer_size];
 //  memcpy((void *) &buffer_copy, &proto_buffer_rx, buffer_size);
@@ -377,9 +358,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
                        VelocityCommand_size);
-
-  end_time = HAL_GetTick();
-  time_diff = end_time - start_time;
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
@@ -391,7 +369,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
       HAL_TIM_Base_Start_IT(&htim3);
 
     }
-
   }
 }
 /* USER CODE END 4 */
