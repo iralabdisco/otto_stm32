@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import rospy, serial, struct, time
+import rospy, serial
 import otto_communication_pb2
 from geometry_msgs.msg import Twist
 from serial import SerialException
@@ -14,31 +14,31 @@ ser = serial.Serial(
         exclusive=None)
 
 def callback(data):
-    linear = -data.linear.x
+    linear = data.linear.x
     angular = -data.angular.z      #da fixare?
     my_velocity = otto_communication_pb2.VelocityCommand()
     my_velocity.linear_velocity = linear;
     my_velocity.angular_velocity = angular;
-    rospy.loginfo('I heard %f %f', linear, angular)
+    rospy.logdebug('Cmd vel transmitted %f %f', linear, angular)
     out_buffer = my_velocity.SerializeToString()
-    print(len(out_buffer))
     ser.write(out_buffer)
     ser.reset_output_buffer()
-    time.sleep(0.002)
     
 def listener():
-    while(ser.is_open == False):
+    rospy.init_node('serial_transmitter', anonymous=True)
+    
+    serial_port = rospy.get_param("serial_port")
+    while(ser.is_open == False and not rospy.is_shutdown()):
         try:
-            ser.port = '/dev/ttyUSB0'
+            ser.port = serial_port
             ser.open()
         except SerialException:
-            print('couldnt open /dev/ttyUSB0')
+            rospy.logerr('Couldn\'t open ' + serial_port)
             time.sleep(2)
     
-    print('ttyUSB0 opened')
-    rospy.init_node('cmd_vel_transmitter', anonymous=True)
+    rospy.loginfo(serial_port + ' opened')
 
-    rospy.Subscriber('/cmd_vel', Twist, callback)
+    rospy.Subscriber('/cmd_vel_throttled', Twist, callback)
 
     rospy.spin()
 

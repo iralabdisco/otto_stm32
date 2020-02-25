@@ -24,16 +24,17 @@ ser = serial.Serial(
         exclusive=False)
 
 def serial_receiver():
-    while(ser.is_open == False):
+    rospy.init_node('serial_receiver', anonymous=True)
+    serial_port = rospy.get_param("serial_port")
+    while(ser.is_open == False and not rospy.is_shutdown()):
         try:
-            ser.port = '/dev/ttyUSB0'
+            ser.port = serial_port
             ser.open()
         except SerialException:
-            print('couldnt open /dev/ttyUSB0')
+            rospy.logerr('Couldn\'t open ' + serial_port)
             time.sleep(2)
 
-    print('ttyUSB0 opened')
-    rospy.init_node('serial_receiver', anonymous=True)
+    rospy.loginfo(serial_port + ' opened')
 
     odom_pub = rospy.Publisher('/odom', Odometry, queue_size=10)
     odom_broadcaster = tf.TransformBroadcaster()
@@ -59,8 +60,9 @@ def serial_receiver():
         
         try:
             otto_status.ParseFromString(encoded_buffer)
-            print(otto_status)
+            rospy.logdebug(otto_status)
             
+            # 3 = RUNNING
             if (otto_status.status == 3):
                 lin_vel = otto_status.linear_velocity
                 ang_vel = otto_status.angular_velocity
@@ -106,7 +108,7 @@ def serial_receiver():
                 odom_pub.publish(odom)
 
         except DecodeError:
-            print("Decode Error")
+            rospy.logerr("Decode Error")
             ser.reset_input_buffer()
 
 
