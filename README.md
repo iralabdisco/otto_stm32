@@ -6,7 +6,7 @@ If you just want to use the program you can download the binary file from the [r
 2. Plug your Nucleo boart to the PC.
 3. Copy and paste the .bin file inside your board.
 
-The main program is located in [otto_controller_source](https://github.com/iralabdisco/otto/tree/master/otto_controller_source).
+The main program is located in [otto_controller](https://github.com/iralabdisco/otto/tree/master/otto_controller).
 
 You can find various useful tools inside the [utils](https://github.com/iralabdisco/otto/tree/master/utils) folder.
 
