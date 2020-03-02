@@ -129,14 +129,12 @@ static void MX_NVIC_Init(void);
 /* USER CODE END 0 */
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
-{
+ * @brief  The application entry point.
+ * @retval int
+ */
+int main(void) {
   /* USER CODE BEGIN 1 */
   /* USER CODE END 1 */
-  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -194,7 +192,7 @@ int main(void)
 
   //Enables UART RX interrupt
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
-                       VelocityCommand_size);
+  VelocityCommand_size);
 
   /* USER CODE END 2 */
 
@@ -209,56 +207,51 @@ int main(void)
 }
 
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
-{
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+ * @brief System Clock Configuration
+ * @retval None
+ */
+void SystemClock_Config(void) {
+  RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = { 0 };
 
   /** Configure the main internal regulator output voltage 
-  */
+   */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
   /** Initializes the CPU, AHB and APB busses clocks 
-  */
+   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
     Error_Handler();
   }
   /** Initializes the CPU, AHB and APB busses clocks 
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
+   */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+      | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) {
     Error_Handler();
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART6;
   PeriphClkInitStruct.Usart6ClockSelection = RCC_USART6CLKSOURCE_PCLK2;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
-  {
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
     Error_Handler();
   }
 }
 
 /**
-  * @brief NVIC Configuration.
-  * @retval None
-  */
-static void MX_NVIC_Init(void)
-{
+ * @brief NVIC Configuration.
+ * @retval None
+ */
+static void MX_NVIC_Init(void) {
   /* TIM3_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM3_IRQn, 2, 1);
   HAL_NVIC_EnableIRQ(TIM3_IRQn);
@@ -295,7 +288,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   //TIMER 10Hz Transmit
   if (htim->Instance == TIM6) {
 
-    pb_ostream_t stream = pb_ostream_from_buffer(proto_buffer_tx, sizeof(proto_buffer_tx));
+    pb_ostream_t stream = pb_ostream_from_buffer(proto_buffer_tx,
+                                                 sizeof(proto_buffer_tx));
 
     float left_wheel = left_encoder.GetLinearVelocity();
     float right_wheel = right_encoder.GetLinearVelocity();
@@ -313,7 +307,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
     pb_encode(&stream, StatusMessage_fields, &status_msg);
 
-    HAL_UART_Transmit_DMA(&huart6,(uint8_t*) &proto_buffer_tx, StatusMessage_size);
+    HAL_UART_Transmit_DMA(&huart6, (uint8_t*) &proto_buffer_tx,
+    StatusMessage_size);
   }
 }
 
@@ -330,7 +325,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   float angular_velocity;
 
   pb_istream_t stream = pb_istream_from_buffer(proto_buffer_rx,
-                                               VelocityCommand_size);
+  VelocityCommand_size);
 
   bool status = pb_decode(&stream, VelocityCommand_fields, &vel_cmd);
 
@@ -349,32 +344,82 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
     float cross_setpoint = left_setpoint - right_setpoint;
     cross_pid.set(cross_setpoint);
 
-
   }
 
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
-                       VelocityCommand_size);
+  VelocityCommand_size);
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   //Blue user button on the NUCLEO board
-  if (GPIO_Pin == GPIO_PIN_13) {
+  if (GPIO_Pin == user_button_Pin) {
     if (mode == 0) {
       mode = 1;
       //Enables TIM3 interrupt (used for PID control)
       HAL_TIM_Base_Start_IT(&htim3);
-
     }
+
+  } else if (GPIO_Pin == fault1_Pin) {
+    left_motor.brake();
+    right_motor.brake();
+    //stop TIM3 interrupt (used for PID control)
+    HAL_TIM_Base_Stop_IT(&htim3);
+
+    //Send status message with error code
+    status_msg.linear_velocity = 0;
+    status_msg.angular_velocity = 0;
+
+    float current_tx_millis = HAL_GetTick();
+    status_msg.delta_millis = current_tx_millis - previous_tx_millis;
+    previous_tx_millis = current_tx_millis;
+
+    status_msg.status = 4;
+
+    pb_ostream_t stream = pb_ostream_from_buffer(proto_buffer_tx,
+                                                 sizeof(proto_buffer_tx));
+    pb_encode(&stream, StatusMessage_fields, &status_msg);
+
+    HAL_UART_Transmit_DMA(&huart6, (uint8_t*) &proto_buffer_tx,
+    StatusMessage_size);
+
+    //loops forever, manual reset is needed
+    while (1);
+
+  } else if (GPIO_Pin == fault2_Pin) {
+    left_motor.brake();
+    right_motor.brake();
+    //stop TIM3 interrupt (used for PID control)
+    HAL_TIM_Base_Stop_IT(&htim3);
+
+    //Send status message with error code
+    status_msg.linear_velocity = 0;
+    status_msg.angular_velocity = 0;
+
+    float current_tx_millis = HAL_GetTick();
+    status_msg.delta_millis = current_tx_millis - previous_tx_millis;
+    previous_tx_millis = current_tx_millis;
+
+    status_msg.status = 5;
+
+    pb_ostream_t stream = pb_ostream_from_buffer(proto_buffer_tx,
+                                                 sizeof(proto_buffer_tx));
+    pb_encode(&stream, StatusMessage_fields, &status_msg);
+
+    HAL_UART_Transmit_DMA(&huart6, (uint8_t*) &proto_buffer_tx,
+    StatusMessage_size);
+
+    //loops forever, manual reset is needed
+    while (1);
   }
+
 }
 /* USER CODE END 4 */
 
 /**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
+ * @brief  This function is executed in case of error occurrence.
+ * @retval None
+ */
+void Error_Handler(void) {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
 
