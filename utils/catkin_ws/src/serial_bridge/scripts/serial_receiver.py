@@ -50,9 +50,10 @@ def serial_receiver():
     status_length = len(encoded_buffer)
 
     odom_values = numpy.array([0,0,0]) #x, y, th
-    icc_x = 0;current_time = rospy.Time.now()
-    icc_y = 0;
-    radius = 0;
+    icc_x = 0
+    icc_y = 0
+    radius = 0
+    current_time = rospy.Time.now()
     
     while (not rospy.is_shutdown()):
         ser.reset_input_buffer()

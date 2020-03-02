@@ -58,7 +58,7 @@
 /* USER CODE BEGIN PV */
 
 //Parameters
-float baseline = 0.3;
+float baseline = 0.435;
 int ticks_per_revolution = 148000;  //x4 resolution
 float right_wheel_circumference = 0.783;  //in meters
 float left_wheel_circumference = 0.789;  //in meters
@@ -300,7 +300,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     float left_wheel = left_encoder.GetLinearVelocity();
     float right_wheel = right_encoder.GetLinearVelocity();
 
-    odom.FromWheelVelToOdom(1, -1);
+    odom.FromWheelVelToOdom(left_wheel, right_wheel);
 
     status_msg.linear_velocity = odom.GetLinearVelocity();
     status_msg.angular_velocity = odom.GetAngularVelocity();
@@ -343,16 +343,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
     float left_setpoint = odom.GetLeftVelocity();
     float right_setpoint = odom.GetRightVelocity();
 
-//    left_pid.set(left_setpoint);
-//    right_pid.set(right_setpoint);
-
-    left_pid.set(0);
-    right_pid.set(0);
+    left_pid.set(left_setpoint);
+    right_pid.set(right_setpoint);
 
     float cross_setpoint = left_setpoint - right_setpoint;
-//    cross_pid.set(cross_setpoint);
+    cross_pid.set(cross_setpoint);
 
-    cross_pid.set(0);
 
   }
 
