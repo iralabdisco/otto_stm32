@@ -24,7 +24,7 @@ ser = serial.Serial(
         exclusive=False)
 
 def serial_receiver():
-    rospy.init_node('serial_receiver', anonymous=True)
+    rospy.init_node('serial_receiver', anonymous=True, log_level=rospy.DEBUG)
     serial_port = rospy.get_param("serial_port")
     while(ser.is_open == False and not rospy.is_shutdown()):
         try:

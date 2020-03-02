@@ -25,7 +25,7 @@ def callback(data):
     ser.reset_output_buffer()
     
 def listener():
-    rospy.init_node('serial_transmitter', anonymous=True)
+    rospy.init_node('serial_transmitter', anonymous=True, log_level=rospy.DEBUG)
     
     serial_port = rospy.get_param("serial_port")
     while(ser.is_open == False and not rospy.is_shutdown()):
