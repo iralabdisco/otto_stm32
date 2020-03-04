@@ -39,7 +39,7 @@ void MX_USART6_UART_Init(void)
   huart6.Init.StopBits = UART_STOPBITS_1;
   huart6.Init.Parity = UART_PARITY_NONE;
   huart6.Init.Mode = UART_MODE_TX_RX;
-  huart6.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart6.Init.HwFlowCtl = UART_HWCONTROL_RTS;
   huart6.Init.OverSampling = UART_OVERSAMPLING_16;
   huart6.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
   huart6.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
@@ -62,11 +62,20 @@ void HAL_UART_MspInit(UART_HandleTypeDef* uartHandle)
     /* USART6 clock enable */
     __HAL_RCC_USART6_CLK_ENABLE();
   
+    __HAL_RCC_GPIOG_CLK_ENABLE();
     __HAL_RCC_GPIOC_CLK_ENABLE();
     /**USART6 GPIO Configuration    
+    PG8     ------> USART6_RTS
     PC6     ------> USART6_TX
     PC7     ------> USART6_RX 
     */
+    GPIO_InitStruct.Pin = GPIO_PIN_8;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF8_USART6;
+    HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
     GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -129,9 +138,12 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* uartHandle)
     __HAL_RCC_USART6_CLK_DISABLE();
   
     /**USART6 GPIO Configuration    
+    PG8     ------> USART6_RTS
     PC6     ------> USART6_TX
     PC7     ------> USART6_RX 
     */
+    HAL_GPIO_DeInit(GPIOG, GPIO_PIN_8);
+
     HAL_GPIO_DeInit(GPIOC, GPIO_PIN_6|GPIO_PIN_7);
 
     /* USART6 DMA DeInit */
