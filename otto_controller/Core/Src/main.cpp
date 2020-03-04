@@ -96,23 +96,24 @@ sleep2_Pin,
                            dir2_Pin,
                            &htim4, TIM_CHANNEL_3);
 
-//Communication
-int mode = 0;  //setup mode
-
 uint8_t proto_buffer_rx[50];
 pb_istream_t in_pb_stream;
 
 VelocityCommand vel_cmd;
-size_t velocity_cmd_length;
 bool rx_status;
 
 uint8_t proto_buffer_tx[100];
 pb_ostream_t out_pb_stream;
 
 StatusMessage status_msg;
-size_t status_msg_length;
 bool tx_status;
 float previous_tx_millis;
+
+ConfigCommand config_cmd;
+
+int otto_status = 0;
+
+int test = 0;
 
 /* USER CODE END PV */
 
@@ -129,12 +130,14 @@ static void MX_NVIC_Init(void);
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
-int main(void) {
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
   /* USER CODE BEGIN 1 */
   /* USER CODE END 1 */
+  
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -187,9 +190,6 @@ int main(void) {
   vel_cmd = VelocityCommand_init_zero;
   status_msg = StatusMessage_init_zero;
 
-  //Enables TIM6 interrupt (used for periodic transmission of the odometry)
-  HAL_TIM_Base_Start_IT(&htim6);
-
   //Enables UART RX interrupt
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
   VelocityCommand_size);
@@ -207,51 +207,56 @@ int main(void) {
 }
 
 /**
- * @brief System Clock Configuration
- * @retval None
- */
-void SystemClock_Config(void) {
-  RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = { 0 };
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage 
-   */
+  */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
   /** Initializes the CPU, AHB and APB busses clocks 
-   */
+  */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
     Error_Handler();
   }
   /** Initializes the CPU, AHB and APB busses clocks 
-   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
-      | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK) {
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  {
     Error_Handler();
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART6;
   PeriphClkInitStruct.Usart6ClockSelection = RCC_USART6CLKSOURCE_PCLK2;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+  {
     Error_Handler();
   }
 }
 
 /**
- * @brief NVIC Configuration.
- * @retval None
- */
-static void MX_NVIC_Init(void) {
+  * @brief NVIC Configuration.
+  * @retval None
+  */
+static void MX_NVIC_Init(void)
+{
   /* TIM3_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM3_IRQn, 2, 1);
   HAL_NVIC_EnableIRQ(TIM3_IRQn);
@@ -313,13 +318,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
-//  size_t buffer_size = sizeof(proto_buffer_rx);
-//  uint8_t buffer_copy[buffer_size];
-//  memcpy((void *) &buffer_copy, &proto_buffer_rx, buffer_size);
-//
-//  HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
-//                         velocity_cmd_length);
-//  mode++;
+
+  test++;
 
   float linear_velocity;
   float angular_velocity;
@@ -327,9 +327,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   pb_istream_t stream = pb_istream_from_buffer(proto_buffer_rx,
   VelocityCommand_size);
 
-  bool status = pb_decode(&stream, VelocityCommand_fields, &vel_cmd);
+  bool decode_status = pb_decode(&stream, VelocityCommand_fields, &vel_cmd);
 
-  if (status) {
+  if (decode_status) {
     linear_velocity = vel_cmd.linear_velocity;
     angular_velocity = vel_cmd.angular_velocity;
 
@@ -346,6 +346,14 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 
   }
 
+  if (otto_status == 0) {
+    //Enables TIM6 interrupt (used for periodic transmission of the odometry)
+    HAL_TIM_Base_Start_IT(&htim6);
+
+    //Enables TIM3 interrupt (used for PID control)
+    HAL_TIM_Base_Start_IT(&htim3);
+  }
+
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
   VelocityCommand_size);
 }
@@ -353,12 +361,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   //Blue user button on the NUCLEO board
   if (GPIO_Pin == user_button_Pin) {
-    if (mode == 0) {
-      mode = 1;
-      //Enables TIM3 interrupt (used for PID control)
-      HAL_TIM_Base_Start_IT(&htim3);
-    }
-
+    //TODO ci può servire il bottone blu?
   } else if (GPIO_Pin == fault1_Pin) {
     left_motor.brake();
     right_motor.brake();
@@ -383,7 +386,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     StatusMessage_size);
 
     //loops forever, manual reset is needed
-    while (1);
+    while (1)
+      ;
 
   } else if (GPIO_Pin == fault2_Pin) {
     left_motor.brake();
@@ -409,17 +413,19 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     StatusMessage_size);
 
     //loops forever, manual reset is needed
-    while (1);
+    while (1)
+      ;
   }
 
 }
 /* USER CODE END 4 */
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
-void Error_Handler(void) {
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
 

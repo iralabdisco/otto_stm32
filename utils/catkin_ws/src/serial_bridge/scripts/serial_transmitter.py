@@ -10,7 +10,7 @@ ser = serial.Serial(
         parity=serial.PARITY_NONE,
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
-        rtscts=False,
+        rtscts=True,
         exclusive=None)
 
 def callback(data):
@@ -21,7 +21,10 @@ def callback(data):
     my_velocity.angular_velocity = angular;
     rospy.logdebug('Cmd vel transmitted %f %f', linear, angular)
     out_buffer = my_velocity.SerializeToString()
-    ser.write(out_buffer)
+    if(ser.cts == True):
+        ser.write(out_buffer)
+    else:
+        rospy.logwarn('ST not ready to receive velocity cmd')
     ser.reset_output_buffer()
     
 def listener():
