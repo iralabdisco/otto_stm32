@@ -1,0 +1,4 @@
+(sym_lib_table
+  (lib (name az_serial_module)(type Legacy)(uri ${KIPRJMOD}/libraries/serial_module/az_serial_module.lib)(options "")(descr ""))
+  (lib (name NUCLEO-F767ZI)(type Legacy)(uri ${KIPRJMOD}/libraries/NUCLEO-F767ZI/NUCLEO-F767ZI.lib)(options "")(descr ""))
+)
