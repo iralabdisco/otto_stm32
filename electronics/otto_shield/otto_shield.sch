@@ -145,54 +145,12 @@ F 6 "STMicroelectronics" H 3380 3550 50  0001 L BNN "Field6"
 	1    3380 3550
 	1    0    0    -1  
 $EndComp
-$Comp
-L NUCLEO-F767ZI:NUCLEO-F767ZI A1
-U 2 1 5E62138F
-P 9480 3680
-F 0 "A1" H 9289 6057 50  0000 C CNN
-F 1 "NUCLEO-F767ZI" H 9289 5966 50  0000 C CNN
-F 2 "NUCLEO-F767ZI:ST_NUCLEO-F767ZI" H 9480 3680 50  0001 L BNN
-F 3 "7" H 9480 3680 50  0001 L BNN
-F 4 "N/A" H 9480 3680 50  0001 L BNN "Field4"
-F 5 "Manufacturer Recommendations" H 9480 3680 50  0001 L BNN "Field5"
-F 6 "STMicroelectronics" H 9480 3680 50  0001 L BNN "Field6"
-	2    9480 3680
-	1    0    0    -1  
-$EndComp
-$Comp
-L Connector:RJ45 J1
-U 1 1 5E70A186
-P 1150 1240
-F 0 "J1" V 1161 1770 50  0000 L CNN
-F 1 "right_encoder" V 1252 1770 50  0000 L CNN
-F 2 "Connector_RJ:RJ45_Amphenol_54602-x08_Horizontal" V 1150 1265 50  0001 C CNN
-F 3 "~" V 1150 1265 50  0001 C CNN
-	1    1150 1240
-	0    1    1    0   
-$EndComp
-$Comp
-L Connector:RJ45 J2
-U 1 1 5E70C268
-P 5970 1270
-F 0 "J2" V 5981 1800 50  0000 L CNN
-F 1 "left_encoder" V 6072 1800 50  0000 L CNN
-F 2 "Connector_RJ:RJ45_Amphenol_54602-x08_Horizontal" V 5970 1295 50  0001 C CNN
-F 3 "~" V 5970 1295 50  0001 C CNN
-	1    5970 1270
-	0    1    1    0   
-$EndComp
-Wire Wire Line
-	850  1640 610  1640
-Wire Wire Line
-	610  1640 610  810 
 Wire Wire Line
 	610  810  2340 810 
 Wire Wire Line
 	4160 810  4160 1650
 Wire Wire Line
 	4160 1650 4080 1650
-Wire Wire Line
-	5670 1670 5200 1670
 Wire Wire Line
 	4220 1670 4220 1650
 Wire Wire Line
@@ -201,34 +159,29 @@ Connection ~ 4160 1650
 $Comp
 L power:GND #PWR0104
 U 1 1 5E72878C
-P 950 1720
-F 0 "#PWR0104" H 950 1470 50  0001 C CNN
-F 1 "GND" H 955 1547 50  0000 C CNN
-F 2 "" H 950 1720 50  0001 C CNN
-F 3 "" H 950 1720 50  0001 C CNN
-	1    950  1720
+P 630 1140
+F 0 "#PWR0104" H 630 890 50  0001 C CNN
+F 1 "GND" H 635 967 50  0000 C CNN
+F 2 "" H 630 1140 50  0001 C CNN
+F 3 "" H 630 1140 50  0001 C CNN
+	1    630  1140
 	1    0    0    -1  
 $EndComp
 $Comp
 L power:GND #PWR0105
 U 1 1 5E72C0C6
-P 5770 1780
-F 0 "#PWR0105" H 5770 1530 50  0001 C CNN
-F 1 "GND" H 5775 1607 50  0000 C CNN
-F 2 "" H 5770 1780 50  0001 C CNN
-F 3 "" H 5770 1780 50  0001 C CNN
-	1    5770 1780
+P 5320 1130
+F 0 "#PWR0105" H 5320 880 50  0001 C CNN
+F 1 "GND" H 5325 957 50  0000 C CNN
+F 2 "" H 5320 1130 50  0001 C CNN
+F 3 "" H 5320 1130 50  0001 C CNN
+	1    5320 1130
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	950  1640 950  1720
-Wire Wire Line
-	5770 1670 5770 1780
 Wire Wire Line
 	5200 1670 5200 2170
 Wire Wire Line
 	5200 2170 7790 2170
-Connection ~ 5200 1670
 Wire Wire Line
 	5200 1670 4220 1670
 Wire Wire Line
@@ -255,20 +208,12 @@ Connection ~ 1880 2100
 Wire Wire Line
 	1880 2100 1880 1500
 Wire Wire Line
-	1050 1640 1050 2550
-Wire Wire Line
-	1050 2550 2220 2550
-Wire Wire Line
 	2180 2490 2220 2490
 Wire Wire Line
 	2220 2490 2220 2550
 Connection ~ 2220 2550
 Wire Wire Line
 	2220 2550 2680 2550
-Wire Wire Line
-	1150 1640 1150 2650
-Wire Wire Line
-	1150 2650 2350 2650
 Wire Wire Line
 	2180 2790 2350 2790
 Wire Wire Line
@@ -289,8 +234,6 @@ Wire Wire Line
 Wire Wire Line
 	8380 3270 8380 3280
 Connection ~ 8380 3280
-Wire Wire Line
-	5970 1670 5970 2280
 Wire Wire Line
 	5970 2280 8380 2280
 Wire Wire Line
@@ -435,4 +378,141 @@ Wire Wire Line
 	4190 5650 4190 5660
 Wire Wire Line
 	4080 5650 4190 5650
+$Comp
+L 3-5338556-1:3-5338556-1 J2
+U 1 1 5E66670D
+P 5480 1030
+F 0 "J2" H 5930 1295 50  0000 C CNN
+F 1 "left_encoder" H 5930 1204 50  0000 C CNN
+F 2 "rj45-353385561:353385561" H 6230 1130 50  0001 L CNN
+F 3 "https://componentsearchengine.com/Datasheets/1/3-5338556-1.pdf" H 6230 1030 50  0001 L CNN
+F 4 "TE Connectivity Female Cat3 RJ45 Modular Jack, STP, Right Angle, PCB Mount Mount, 35338556" H 6230 930 50  0001 L CNN "Description"
+F 5 "13.15" H 6230 830 50  0001 L CNN "Height"
+F 6 "571-3-5338556-1" H 6230 730 50  0001 L CNN "Mouser Part Number"
+F 7 "https://www.mouser.com/Search/Refine.aspx?Keyword=571-3-5338556-1" H 6230 630 50  0001 L CNN "Mouser Price/Stock"
+F 8 "TE Connectivity" H 6230 530 50  0001 L CNN "Manufacturer_Name"
+F 9 "3-5338556-1" H 6230 430 50  0001 L CNN "Manufacturer_Part_Number"
+	1    5480 1030
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5200 1670 5200 1030
+Wire Wire Line
+	5200 1030 5480 1030
+Connection ~ 5200 1670
+Wire Wire Line
+	5320 1130 5480 1130
+Wire Wire Line
+	5870 1670 5420 1670
+Wire Wire Line
+	5420 1670 5420 1230
+Wire Wire Line
+	5420 1230 5480 1230
+Wire Wire Line
+	5970 1580 5460 1580
+Wire Wire Line
+	5460 1580 5460 1330
+Wire Wire Line
+	5460 1330 5480 1330
+Wire Wire Line
+	5970 1580 5970 2280
+$Comp
+L NUCLEO-F767ZI:NUCLEO-F767ZI A1
+U 2 1 5E62138F
+P 9480 3680
+F 0 "A1" H 9289 6057 50  0000 C CNN
+F 1 "NUCLEO-F767ZI" H 9289 5966 50  0000 C CNN
+F 2 "NUCLEO-F767ZI:ST_NUCLEO-F767ZI" H 9480 3680 50  0001 L BNN
+F 3 "7" H 9480 3680 50  0001 L BNN
+F 4 "N/A" H 9480 3680 50  0001 L BNN "Field4"
+F 5 "Manufacturer Recommendations" H 9480 3680 50  0001 L BNN "Field5"
+F 6 "STMicroelectronics" H 9480 3680 50  0001 L BNN "Field6"
+	2    9480 3680
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0107
+U 1 1 5E66D988
+P 6610 1300
+F 0 "#PWR0107" H 6610 1050 50  0001 C CNN
+F 1 "GND" H 6615 1127 50  0000 C CNN
+F 2 "" H 6610 1300 50  0001 C CNN
+F 3 "" H 6610 1300 50  0001 C CNN
+	1    6610 1300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	6380 1330 6480 1330
+Wire Wire Line
+	6500 1330 6500 1300
+Wire Wire Line
+	6500 1300 6610 1300
+Wire Wire Line
+	6380 1430 6480 1430
+Wire Wire Line
+	6480 1430 6480 1330
+Connection ~ 6480 1330
+Wire Wire Line
+	6480 1330 6500 1330
+$Comp
+L 3-5338556-1:3-5338556-1 J1
+U 1 1 5E6DB436
+P 860 1040
+F 0 "J1" H 1310 1305 50  0000 C CNN
+F 1 "3-5338556-1" H 1310 1214 50  0000 C CNN
+F 2 "353385561" H 1610 1140 50  0001 L CNN
+F 3 "https://componentsearchengine.com/Datasheets/1/3-5338556-1.pdf" H 1610 1040 50  0001 L CNN
+F 4 "TE Connectivity Female Cat3 RJ45 Modular Jack, STP, Right Angle, PCB Mount Mount, 35338556" H 1610 940 50  0001 L CNN "Description"
+F 5 "13.15" H 1610 840 50  0001 L CNN "Height"
+F 6 "571-3-5338556-1" H 1610 740 50  0001 L CNN "Mouser Part Number"
+F 7 "https://www.mouser.com/Search/Refine.aspx?Keyword=571-3-5338556-1" H 1610 640 50  0001 L CNN "Mouser Price/Stock"
+F 8 "TE Connectivity" H 1610 540 50  0001 L CNN "Manufacturer_Name"
+F 9 "3-5338556-1" H 1610 440 50  0001 L CNN "Manufacturer_Part_Number"
+	1    860  1040
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	610  810  610  1020
+Wire Wire Line
+	610  1020 860  1020
+Wire Wire Line
+	860  1020 860  1040
+Wire Wire Line
+	630  1140 860  1140
+Wire Wire Line
+	720  1240 860  1240
+Wire Wire Line
+	720  1240 720  2550
+Wire Wire Line
+	720  2550 2220 2550
+Wire Wire Line
+	810  1340 860  1340
+Wire Wire Line
+	810  1340 810  2650
+Wire Wire Line
+	810  2650 2350 2650
+$Comp
+L power:GND #PWR0108
+U 1 1 5E7285F3
+P 1910 1300
+F 0 "#PWR0108" H 1910 1050 50  0001 C CNN
+F 1 "GND" H 1915 1127 50  0000 C CNN
+F 2 "" H 1910 1300 50  0001 C CNN
+F 3 "" H 1910 1300 50  0001 C CNN
+	1    1910 1300
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	1760 1340 1790 1340
+Wire Wire Line
+	1810 1340 1810 1300
+Wire Wire Line
+	1810 1300 1910 1300
+Wire Wire Line
+	1760 1440 1790 1440
+Wire Wire Line
+	1790 1440 1790 1340
+Connection ~ 1790 1340
+Wire Wire Line
+	1790 1340 1810 1340
 $EndSCHEMATC
