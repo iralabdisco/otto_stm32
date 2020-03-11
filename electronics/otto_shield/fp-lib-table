@@ -2,4 +2,5 @@
   (lib (name ira_logo)(type KiCad)(uri ${KIPRJMOD}/libraries/ira_logo)(options "")(descr ""))
   (lib (name NUCLEO-F767ZI)(type KiCad)(uri ${KIPRJMOD}/libraries/NUCLEO-F767ZI)(options "")(descr ""))
   (lib (name az_serial_module)(type KiCad)(uri ${KIPRJMOD}/libraries/serial_module/az_serial_module.pretty)(options "")(descr ""))
+  (lib (name rj45-353385561)(type KiCad)(uri ${KIPRJMOD}/libraries/rj45-353385561)(options "")(descr ""))
 )
