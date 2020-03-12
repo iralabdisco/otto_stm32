@@ -114,6 +114,7 @@ ConfigCommand config_cmd;
 int otto_status = 0;
 
 int test = 0;
+int error = 0;
 
 /* USER CODE END PV */
 
@@ -195,6 +196,8 @@ int main(void)
   VelocityCommand_size);
 
   /* USER CODE END 2 */
+ 
+ 
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -356,6 +359,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
   VelocityCommand_size);
+}
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle){
+  error++;
+  HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
+    VelocityCommand_size);
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {

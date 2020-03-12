@@ -4,8 +4,8 @@
   <node name="serial_receiver" pkg="serial_bridge" type="serial_receiver.py"/>
   
   <!-- Node used to slow down /cmd_vel transmission to 10Hz -->
-  <node name="cmd_vel_throttler" type="throttle" pkg="topic_tools" 
-    args="messages /cmd_vel 20 /cmd_vel_throttled" />
+  <!-- <node name="cmd_vel_throttler" type="throttle" pkg="topic_tools" 
+        args="messages /cmd_vel 10000 /cmd_vel_throttled" /> -->
   
   <!-- Serial port -->  
   <param name="serial_port" value="/dev/ttyUSB0"/>
