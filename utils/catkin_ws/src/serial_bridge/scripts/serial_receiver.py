@@ -24,6 +24,9 @@ ser = serial.Serial(
 def serial_receiver():
     rospy.init_node('serial_receiver', anonymous=True, log_level=rospy.DEBUG)
     serial_port = rospy.get_param("serial_port")
+    #dtr is connected to RST, on opening dtr is high by default so it resets the st board
+    #after opening the serial port we set it low so the board can boot
+    ser.dtr = 0 
     while(ser.is_open == False and not rospy.is_shutdown()):
         try:
             ser.port = serial_port
