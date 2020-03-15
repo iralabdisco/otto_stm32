@@ -114,6 +114,7 @@ ConfigCommand config_cmd;
 int otto_status = 0;
 
 int test = 0;
+int error = 0;
 
 /* USER CODE END PV */
 
@@ -195,6 +196,8 @@ int main(void)
   VelocityCommand_size);
 
   /* USER CODE END 2 */
+ 
+ 
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -299,7 +302,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     float left_wheel = left_encoder.GetLinearVelocity();
     float right_wheel = right_encoder.GetLinearVelocity();
 
-    odom.FromWheelVelToOdom(left_wheel, right_wheel);
+//    odom.FromWheelVelToOdom(left_wheel, right_wheel);
+
+    odom.FromWheelVelToOdom(0.5, -0.5);
 
     status_msg.linear_velocity = odom.GetLinearVelocity();
     status_msg.angular_velocity = odom.GetAngularVelocity();
@@ -354,6 +359,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
     HAL_TIM_Base_Start_IT(&htim3);
   }
 
+  HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
+  VelocityCommand_size);
+}
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle) {
+  error++;
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
   VelocityCommand_size);
 }
