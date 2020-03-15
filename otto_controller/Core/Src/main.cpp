@@ -302,7 +302,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     float left_wheel = left_encoder.GetLinearVelocity();
     float right_wheel = right_encoder.GetLinearVelocity();
 
-    odom.FromWheelVelToOdom(left_wheel, right_wheel);
+//    odom.FromWheelVelToOdom(left_wheel, right_wheel);
+
+    odom.FromWheelVelToOdom(0.5, -0.5);
 
     status_msg.linear_velocity = odom.GetLinearVelocity();
     status_msg.angular_velocity = odom.GetAngularVelocity();
@@ -361,10 +363,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   VelocityCommand_size);
 }
 
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle){
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle) {
   error++;
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
-    VelocityCommand_size);
+  VelocityCommand_size);
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+
 import rospy, serial
 import otto_communication_pb2
 from geometry_msgs.msg import Twist
@@ -8,6 +9,7 @@ from serial import SerialException
 ser = serial.Serial(
         baudrate=9600,
         parity=serial.PARITY_NONE,
+
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
         rtscts=True,
@@ -41,7 +43,7 @@ def listener():
     
     rospy.loginfo(serial_port + ' opened')
 
-    rospy.Subscriber('/cmd_vel_throttled', Twist, callback)
+    rospy.Subscriber('/cmd_vel', Twist, callback)
 
     rospy.spin()
 

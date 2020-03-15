@@ -12,8 +12,6 @@ import tf
 
 import numpy
 
-
-
 ser = serial.Serial(
         baudrate=9600,
         timeout = None,
@@ -35,7 +33,6 @@ def serial_receiver():
             time.sleep(2)
 
     rospy.loginfo(serial_port + ' opened')
-
     odom_pub = rospy.Publisher('/odom', Odometry, queue_size=10)
     odom_broadcaster = tf.TransformBroadcaster()
 
@@ -55,10 +52,9 @@ def serial_receiver():
     radius = 0
     current_time = rospy.Time.now()
     
+    ser.reset_input_buffer()
     while (not rospy.is_shutdown()):
-        ser.reset_input_buffer()
         encoded_buffer = ser.read(status_length)
-        
         try:
             otto_status.ParseFromString(encoded_buffer)
             rospy.logdebug(otto_status)
@@ -111,7 +107,6 @@ def serial_receiver():
         except DecodeError:
             rospy.logerr("Decode Error")
             ser.reset_input_buffer()
-
 
 if __name__ == '__main__':
     serial_receiver()
