@@ -6,7 +6,7 @@ encoding utf-8
 Sheet 1 1
 Title "otto_shield"
 Date "2020-03-06"
-Rev "A"
+Rev "1.1"
 Comp "iralab"
 Comment1 ""
 Comment2 ""
@@ -14,78 +14,14 @@ Comment3 ""
 Comment4 ""
 $EndDescr
 $Comp
-L Device:R R1
-U 1 1 5E67BB10
-P 2030 2490
-F 0 "R1" V 1823 2490 50  0000 C CNN
-F 1 "2.7K" V 1914 2490 50  0000 C CNN
-F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" V 1960 2490 50  0001 C CNN
-F 3 "~" H 2030 2490 50  0001 C CNN
-	1    2030 2490
-	0    1    1    0   
-$EndComp
-$Comp
-L Device:R R2
-U 1 1 5E67CB6D
-P 2030 2790
-F 0 "R2" V 1823 2790 50  0000 C CNN
-F 1 "2.7K" V 1914 2790 50  0000 C CNN
-F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" V 1960 2790 50  0001 C CNN
-F 3 "~" H 2030 2790 50  0001 C CNN
-	1    2030 2790
-	0    1    1    0   
-$EndComp
-$Comp
-L Device:R R3
-U 1 1 5E67DA7F
-P 8110 3270
-F 0 "R3" V 7903 3270 50  0000 C CNN
-F 1 "2.7K" V 7994 3270 50  0000 C CNN
-F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" V 8040 3270 50  0001 C CNN
-F 3 "~" H 8110 3270 50  0001 C CNN
-	1    8110 3270
-	0    1    1    0   
-$EndComp
-$Comp
-L Device:R R4
-U 1 1 5E67E80F
-P 7940 2170
-F 0 "R4" V 7733 2170 50  0000 C CNN
-F 1 "2.7K" V 7824 2170 50  0000 C CNN
-F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" V 7870 2170 50  0001 C CNN
-F 3 "~" H 7940 2170 50  0001 C CNN
-	1    7940 2170
-	0    1    1    0   
-$EndComp
-Wire Wire Line
-	6590 4260 6590 5980
-Wire Wire Line
-	6590 5980 10480 5980
-Wire Wire Line
-	10480 5980 10480 5280
-Wire Wire Line
-	10480 5280 10380 5280
-Wire Wire Line
-	8070 4880 8580 4880
-Wire Wire Line
-	8070 4760 8070 4880
-Wire Wire Line
-	8070 4360 8180 4360
-Wire Wire Line
-	8180 4360 8180 4780
-Wire Wire Line
-	8180 4780 8580 4780
-Wire Wire Line
-	7120 4260 6590 4260
-$Comp
 L az_serial_module:az_serial_module U1
 U 1 1 5E60DDAF
-P 7670 3860
-F 0 "U1" H 7595 4125 50  0000 C CNN
-F 1 "az_serial_module" H 7595 4034 50  0000 C CNN
-F 2 "az_serial_module:az_serial_module" H 7620 3760 50  0001 C CNN
-F 3 "" H 7620 3760 50  0001 C CNN
-	1    7670 3860
+P 2170 5680
+F 0 "U1" H 2095 5945 50  0000 C CNN
+F 1 "az_serial_module" H 2095 5854 50  0000 C CNN
+F 2 "az_serial_module:az_serial_module" H 2120 5580 50  0001 C CNN
+F 3 "" H 2120 5580 50  0001 C CNN
+	1    2170 5680
 	1    0    0    -1  
 $EndComp
 $Comp
@@ -103,206 +39,78 @@ Wire Wire Line
 	10380 5680 10660 5680
 Wire Wire Line
 	10660 5680 10660 5750
-$Comp
-L power:GND #PWR0102
-U 1 1 5E6B5821
-P 8270 4170
-F 0 "#PWR0102" H 8270 3920 50  0001 C CNN
-F 1 "GND" H 8275 3997 50  0000 C CNN
-F 2 "" H 8270 4170 50  0001 C CNN
-F 3 "" H 8270 4170 50  0001 C CNN
-	1    8270 4170
-	1    0    0    -1  
-$EndComp
 Wire Wire Line
-	8070 4160 8270 4160
-Wire Wire Line
-	8270 4160 8270 4170
-$Comp
-L power:GND #PWR0103
-U 1 1 5E6B947D
-P 7000 4760
-F 0 "#PWR0103" H 7000 4510 50  0001 C CNN
-F 1 "GND" H 7005 4587 50  0000 C CNN
-F 2 "" H 7000 4760 50  0001 C CNN
-F 3 "" H 7000 4760 50  0001 C CNN
-	1    7000 4760
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	7000 4760 7120 4760
+	1500 6580 1620 6580
 $Comp
 L NUCLEO-F767ZI:NUCLEO-F767ZI A1
 U 1 1 5E60E56C
-P 3380 3550
-F 0 "A1" H 3089 5927 50  0000 C CNN
-F 1 "NUCLEO-F767ZI" H 3089 5836 50  0000 C CNN
-F 2 "NUCLEO-F767ZI:ST_NUCLEO-F767ZI" H 3380 3550 50  0001 L BNN
-F 3 "7" H 3380 3550 50  0001 L BNN
-F 4 "N/A" H 3380 3550 50  0001 L BNN "Field4"
-F 5 "Manufacturer Recommendations" H 3380 3550 50  0001 L BNN "Field5"
-F 6 "STMicroelectronics" H 3380 3550 50  0001 L BNN "Field6"
-	1    3380 3550
+P 6410 3500
+F 0 "A1" H 6119 5877 50  0000 C CNN
+F 1 "NUCLEO-F767ZI" H 6119 5786 50  0000 C CNN
+F 2 "NUCLEO-F767ZI:ST_NUCLEO-F767ZI" H 6410 3500 50  0001 L BNN
+F 3 "7" H 6410 3500 50  0001 L BNN
+F 4 "N/A" H 6410 3500 50  0001 L BNN "Field4"
+F 5 "Manufacturer Recommendations" H 6410 3500 50  0001 L BNN "Field5"
+F 6 "STMicroelectronics" H 6410 3500 50  0001 L BNN "Field6"
+	1    6410 3500
 	1    0    0    -1  
 $EndComp
-Wire Wire Line
-	610  810  2340 810 
-Wire Wire Line
-	4160 810  4160 1650
-Wire Wire Line
-	4160 1650 4080 1650
-Wire Wire Line
-	4220 1670 4220 1650
-Wire Wire Line
-	4220 1650 4160 1650
-Connection ~ 4160 1650
-$Comp
-L power:GND #PWR0104
-U 1 1 5E72878C
-P 630 1140
-F 0 "#PWR0104" H 630 890 50  0001 C CNN
-F 1 "GND" H 635 967 50  0000 C CNN
-F 2 "" H 630 1140 50  0001 C CNN
-F 3 "" H 630 1140 50  0001 C CNN
-	1    630  1140
-	1    0    0    -1  
-$EndComp
-$Comp
-L power:GND #PWR0105
-U 1 1 5E72C0C6
-P 5320 1130
-F 0 "#PWR0105" H 5320 880 50  0001 C CNN
-F 1 "GND" H 5325 957 50  0000 C CNN
-F 2 "" H 5320 1130 50  0001 C CNN
-F 3 "" H 5320 1130 50  0001 C CNN
-	1    5320 1130
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	5200 1670 5200 2170
-Wire Wire Line
-	5200 2170 7790 2170
-Wire Wire Line
-	5200 1670 4220 1670
-Wire Wire Line
-	5200 2170 5200 3270
-Wire Wire Line
-	5200 3270 7960 3270
-Connection ~ 5200 2170
-Wire Wire Line
-	1880 2490 1880 2100
-Wire Wire Line
-	1880 1500 2340 1500
-Wire Wire Line
-	2340 1500 2340 810 
-Connection ~ 2340 810 
-Wire Wire Line
-	2340 810  4160 810 
-Wire Wire Line
-	1880 2100 1760 2100
-Wire Wire Line
-	1760 2100 1760 2790
-Wire Wire Line
-	1760 2790 1880 2790
-Connection ~ 1880 2100
-Wire Wire Line
-	1880 2100 1880 1500
-Wire Wire Line
-	2180 2490 2220 2490
-Wire Wire Line
-	2220 2490 2220 2550
-Connection ~ 2220 2550
-Wire Wire Line
-	2220 2550 2680 2550
-Wire Wire Line
-	2180 2790 2350 2790
-Wire Wire Line
-	2350 2790 2350 2650
-Connection ~ 2350 2650
-Wire Wire Line
-	2350 2650 2680 2650
-Wire Wire Line
-	5870 1670 5870 3370
-Wire Wire Line
-	5870 3370 8380 3370
-Wire Wire Line
-	8380 3370 8380 3280
-Wire Wire Line
-	8380 3280 8580 3280
-Wire Wire Line
-	8260 3270 8380 3270
-Wire Wire Line
-	8380 3270 8380 3280
-Connection ~ 8380 3280
-Wire Wire Line
-	5970 2280 8380 2280
-Wire Wire Line
-	8380 2180 8580 2180
-Wire Wire Line
-	8090 2170 8380 2170
-Wire Wire Line
-	8380 2170 8380 2180
-Connection ~ 8380 2180
-Wire Wire Line
-	8380 2180 8380 2280
-NoConn ~ 2680 2250
-NoConn ~ 2680 2350
-NoConn ~ 2680 2750
-NoConn ~ 2680 2850
-NoConn ~ 2680 2950
-NoConn ~ 2680 3050
-NoConn ~ 2680 3250
-NoConn ~ 2680 3350
-NoConn ~ 2680 3550
-NoConn ~ 2680 3650
-NoConn ~ 2680 3750
-NoConn ~ 2680 3850
-NoConn ~ 2680 3950
-NoConn ~ 2680 4050
-NoConn ~ 2680 4150
-NoConn ~ 2680 4250
-NoConn ~ 2680 4350
-NoConn ~ 2680 4450
-NoConn ~ 2680 4650
-NoConn ~ 2680 4750
-NoConn ~ 2680 4850
-NoConn ~ 2680 4950
-NoConn ~ 2680 5050
-NoConn ~ 2680 5150
-NoConn ~ 2680 5250
-NoConn ~ 2680 5350
-NoConn ~ 2680 5450
-NoConn ~ 4080 5250
-NoConn ~ 4080 5150
-NoConn ~ 4080 4950
-NoConn ~ 4080 4850
-NoConn ~ 4080 4750
-NoConn ~ 4080 4650
-NoConn ~ 4080 4550
-NoConn ~ 4080 4450
-NoConn ~ 4080 4350
-NoConn ~ 4080 4250
-NoConn ~ 4080 4150
-NoConn ~ 4080 4050
-NoConn ~ 4080 3850
-NoConn ~ 4080 3750
-NoConn ~ 4080 3650
-NoConn ~ 4080 3550
-NoConn ~ 4080 3450
-NoConn ~ 4080 3350
-NoConn ~ 4080 3250
-NoConn ~ 4080 3050
-NoConn ~ 4080 2950
-NoConn ~ 4080 2850
-NoConn ~ 4080 2750
-NoConn ~ 4080 2650
-NoConn ~ 4080 2550
-NoConn ~ 4080 2350
-NoConn ~ 4080 2050
-NoConn ~ 4080 1950
-NoConn ~ 4080 1850
-NoConn ~ 4080 1750
-NoConn ~ 4080 1550
+NoConn ~ 5710 2200
+NoConn ~ 5710 2700
+NoConn ~ 5710 2800
+NoConn ~ 5710 2900
+NoConn ~ 5710 3000
+NoConn ~ 5710 3200
+NoConn ~ 5710 3300
+NoConn ~ 5710 3500
+NoConn ~ 5710 3600
+NoConn ~ 5710 3700
+NoConn ~ 5710 3800
+NoConn ~ 5710 3900
+NoConn ~ 5710 4000
+NoConn ~ 5710 4100
+NoConn ~ 5710 4200
+NoConn ~ 5710 4300
+NoConn ~ 5710 4400
+NoConn ~ 5710 4600
+NoConn ~ 5710 4700
+NoConn ~ 5710 4800
+NoConn ~ 5710 4900
+NoConn ~ 5710 5000
+NoConn ~ 5710 5100
+NoConn ~ 5710 5200
+NoConn ~ 5710 5300
+NoConn ~ 5710 5400
+NoConn ~ 7110 5200
+NoConn ~ 7110 5100
+NoConn ~ 7110 4900
+NoConn ~ 7110 4700
+NoConn ~ 7110 4600
+NoConn ~ 7110 4500
+NoConn ~ 7110 4400
+NoConn ~ 7110 4300
+NoConn ~ 7110 4200
+NoConn ~ 7110 4100
+NoConn ~ 7110 4000
+NoConn ~ 7110 3800
+NoConn ~ 7110 3700
+NoConn ~ 7110 3600
+NoConn ~ 7110 3500
+NoConn ~ 7110 3400
+NoConn ~ 7110 3300
+NoConn ~ 7110 3200
+NoConn ~ 7110 3000
+NoConn ~ 7110 2900
+NoConn ~ 7110 2800
+NoConn ~ 7110 2700
+NoConn ~ 7110 2600
+NoConn ~ 7110 2500
+NoConn ~ 7110 2300
+NoConn ~ 7110 2000
+NoConn ~ 7110 1900
+NoConn ~ 7110 1800
+NoConn ~ 7110 1700
+NoConn ~ 7110 1500
 NoConn ~ 10380 5580
 NoConn ~ 10380 5380
 NoConn ~ 10380 5180
@@ -366,56 +174,84 @@ NoConn ~ 8580 5080
 $Comp
 L power:GND #PWR0106
 U 1 1 5E840035
-P 4190 5660
-F 0 "#PWR0106" H 4190 5410 50  0001 C CNN
-F 1 "GND" H 4195 5487 50  0000 C CNN
-F 2 "" H 4190 5660 50  0001 C CNN
-F 3 "" H 4190 5660 50  0001 C CNN
-	1    4190 5660
+P 7220 5610
+F 0 "#PWR0106" H 7220 5360 50  0001 C CNN
+F 1 "GND" H 7225 5437 50  0000 C CNN
+F 2 "" H 7220 5610 50  0001 C CNN
+F 3 "" H 7220 5610 50  0001 C CNN
+	1    7220 5610
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	4190 5650 4190 5660
+	7220 5600 7220 5610
 Wire Wire Line
-	4080 5650 4190 5650
+	7110 5600 7220 5600
 $Comp
 L 3-5338556-1:3-5338556-1 J2
 U 1 1 5E66670D
-P 5480 1030
-F 0 "J2" H 5930 1295 50  0000 C CNN
-F 1 "left_encoder" H 5930 1204 50  0000 C CNN
-F 2 "rj45-353385561:353385561" H 6230 1130 50  0001 L CNN
-F 3 "https://componentsearchengine.com/Datasheets/1/3-5338556-1.pdf" H 6230 1030 50  0001 L CNN
-F 4 "TE Connectivity Female Cat3 RJ45 Modular Jack, STP, Right Angle, PCB Mount Mount, 35338556" H 6230 930 50  0001 L CNN "Description"
-F 5 "13.15" H 6230 830 50  0001 L CNN "Height"
-F 6 "571-3-5338556-1" H 6230 730 50  0001 L CNN "Mouser Part Number"
-F 7 "https://www.mouser.com/Search/Refine.aspx?Keyword=571-3-5338556-1" H 6230 630 50  0001 L CNN "Mouser Price/Stock"
-F 8 "TE Connectivity" H 6230 530 50  0001 L CNN "Manufacturer_Name"
-F 9 "3-5338556-1" H 6230 430 50  0001 L CNN "Manufacturer_Part_Number"
-	1    5480 1030
+P 1240 3830
+F 0 "J2" H 1690 4095 50  0000 C CNN
+F 1 "3-5338556-1" H 1690 4004 50  0000 C CNN
+F 2 "rj45-353385561:353385561" H 1990 3930 50  0001 L CNN
+F 3 "https://componentsearchengine.com/Datasheets/1/3-5338556-1.pdf" H 1990 3830 50  0001 L CNN
+F 4 "TE Connectivity Female Cat3 RJ45 Modular Jack, STP, Right Angle, PCB Mount Mount, 35338556" H 1990 3730 50  0001 L CNN "Description"
+F 5 "13.15" H 1990 3630 50  0001 L CNN "Height"
+F 6 "571-3-5338556-1" H 1990 3530 50  0001 L CNN "Mouser Part Number"
+F 7 "https://www.mouser.com/Search/Refine.aspx?Keyword=571-3-5338556-1" H 1990 3430 50  0001 L CNN "Mouser Price/Stock"
+F 8 "TE Connectivity" H 1990 3330 50  0001 L CNN "Manufacturer_Name"
+F 9 "3-5338556-1" H 1990 3230 50  0001 L CNN "Manufacturer_Part_Number"
+	1    1240 3830
 	1    0    0    -1  
 $EndComp
+$Comp
+L 3-5338556-1:3-5338556-1 J1
+U 1 1 5E6DB436
+P 1220 2550
+F 0 "J1" H 1670 2815 50  0000 C CNN
+F 1 "3-5338556-1" H 1670 2724 50  0000 C CNN
+F 2 "rj45-353385561:353385561" H 1970 2650 50  0001 L CNN
+F 3 "https://componentsearchengine.com/Datasheets/1/3-5338556-1.pdf" H 1970 2550 50  0001 L CNN
+F 4 "TE Connectivity Female Cat3 RJ45 Modular Jack, STP, Right Angle, PCB Mount Mount, 35338556" H 1970 2450 50  0001 L CNN "Description"
+F 5 "13.15" H 1970 2350 50  0001 L CNN "Height"
+F 6 "571-3-5338556-1" H 1970 2250 50  0001 L CNN "Mouser Part Number"
+F 7 "https://www.mouser.com/Search/Refine.aspx?Keyword=571-3-5338556-1" H 1970 2150 50  0001 L CNN "Mouser Price/Stock"
+F 8 "TE Connectivity" H 1970 2050 50  0001 L CNN "Manufacturer_Name"
+F 9 "3-5338556-1" H 1970 1950 50  0001 L CNN "Manufacturer_Part_Number"
+	1    1220 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0103
+U 1 1 5E6B947D
+P 1500 6580
+F 0 "#PWR0103" H 1500 6330 50  0001 C CNN
+F 1 "GND" H 1505 6407 50  0000 C CNN
+F 2 "" H 1500 6580 50  0001 C CNN
+F 3 "" H 1500 6580 50  0001 C CNN
+	1    1500 6580
+	1    0    0    -1  
+$EndComp
+Text Label 1200 6080 0    50   ~ 0
+USART_RTS
+Text Label 10740 5280 2    50   ~ 0
+USART_RTS
+$Comp
+L power:GND #PWR0102
+U 1 1 5E6B5821
+P 2600 5980
+F 0 "#PWR0102" H 2600 5730 50  0001 C CNN
+F 1 "GND" H 2605 5807 50  0000 C CNN
+F 2 "" H 2600 5980 50  0001 C CNN
+F 3 "" H 2600 5980 50  0001 C CNN
+	1    2600 5980
+	0    -1   -1   0   
+$EndComp
 Wire Wire Line
-	5200 1670 5200 1030
-Wire Wire Line
-	5200 1030 5480 1030
-Connection ~ 5200 1670
-Wire Wire Line
-	5320 1130 5480 1130
-Wire Wire Line
-	5870 1670 5420 1670
-Wire Wire Line
-	5420 1670 5420 1230
-Wire Wire Line
-	5420 1230 5480 1230
-Wire Wire Line
-	5970 1580 5460 1580
-Wire Wire Line
-	5460 1580 5460 1330
-Wire Wire Line
-	5460 1330 5480 1330
-Wire Wire Line
-	5970 1580 5970 2280
+	2570 5980 2600 5980
+Text Label 3050 6180 2    50   ~ 0
+USART_TX
+Text Label 8290 4780 0    50   ~ 0
+USART_TX
 $Comp
 L NUCLEO-F767ZI:NUCLEO-F767ZI A1
 U 2 1 5E62138F
@@ -430,89 +266,331 @@ F 6 "STMicroelectronics" H 9480 3680 50  0001 L BNN "Field6"
 	2    9480 3680
 	1    0    0    -1  
 $EndComp
+Text Notes 1420 2240 0    50   ~ 0
+Right encoder\n
+Text Notes 1430 3490 0    50   ~ 0
+Left encoder\n
 $Comp
-L power:GND #PWR0107
-U 1 1 5E66D988
-P 6610 1300
-F 0 "#PWR0107" H 6610 1050 50  0001 C CNN
-F 1 "GND" H 6615 1127 50  0000 C CNN
-F 2 "" H 6610 1300 50  0001 C CNN
-F 3 "" H 6610 1300 50  0001 C CNN
-	1    6610 1300
+L power:+5V #PWR0104
+U 1 1 5E953EC8
+P 4500 2370
+F 0 "#PWR0104" H 4500 2220 50  0001 C CNN
+F 1 "+5V" H 4515 2543 50  0000 C CNN
+F 2 "" H 4500 2370 50  0001 C CNN
+F 3 "" H 4500 2370 50  0001 C CNN
+	1    4500 2370
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R1
+U 1 1 5E95604E
+P 4720 2370
+F 0 "R1" V 4513 2370 50  0000 C CNN
+F 1 "2.7K" V 4604 2370 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" V 4650 2370 50  0001 C CNN
+F 3 "~" H 4720 2370 50  0001 C CNN
+	1    4720 2370
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4500 2370 4570 2370
+$Comp
+L power:+5V #PWR0105
+U 1 1 5E9726A5
+P 4510 2770
+F 0 "#PWR0105" H 4510 2620 50  0001 C CNN
+F 1 "+5V" H 4525 2943 50  0000 C CNN
+F 2 "" H 4510 2770 50  0001 C CNN
+F 3 "" H 4510 2770 50  0001 C CNN
+	1    4510 2770
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R2
+U 1 1 5E9726AB
+P 4730 2770
+F 0 "R2" V 4523 2770 50  0000 C CNN
+F 1 "2.7K" V 4614 2770 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" V 4660 2770 50  0001 C CNN
+F 3 "~" H 4730 2770 50  0001 C CNN
+	1    4730 2770
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	4510 2770 4580 2770
+$Comp
+L power:+5V #PWR0107
+U 1 1 5E976359
+P 7610 2190
+F 0 "#PWR0107" H 7610 2040 50  0001 C CNN
+F 1 "+5V" H 7625 2363 50  0000 C CNN
+F 2 "" H 7610 2190 50  0001 C CNN
+F 3 "" H 7610 2190 50  0001 C CNN
+	1    7610 2190
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R4
+U 1 1 5E97635F
+P 7830 2190
+F 0 "R4" V 7623 2190 50  0000 C CNN
+F 1 "2.7K" V 7714 2190 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" V 7760 2190 50  0001 C CNN
+F 3 "~" H 7830 2190 50  0001 C CNN
+	1    7830 2190
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7610 2190 7680 2190
+$Comp
+L power:+5V #PWR0108
+U 1 1 5E97BFCD
+P 7500 3390
+F 0 "#PWR0108" H 7500 3240 50  0001 C CNN
+F 1 "+5V" H 7515 3563 50  0000 C CNN
+F 2 "" H 7500 3390 50  0001 C CNN
+F 3 "" H 7500 3390 50  0001 C CNN
+	1    7500 3390
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:R R3
+U 1 1 5E97BFD3
+P 7720 3390
+F 0 "R3" V 7513 3390 50  0000 C CNN
+F 1 "2.7K" V 7604 3390 50  0000 C CNN
+F 2 "Resistor_THT:R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal" V 7650 3390 50  0001 C CNN
+F 3 "~" H 7720 3390 50  0001 C CNN
+	1    7720 3390
+	0    1    1    0   
+$EndComp
+Wire Wire Line
+	7500 3390 7570 3390
+Text Label 4950 2500 0    50   ~ 0
+TIM5_CH1
+Text Label 5020 2600 0    50   ~ 0
+TIM5_CH2
+Text Label 8190 3280 0    50   ~ 0
+TIM2_CH2
+Text Label 8150 2170 0    50   ~ 0
+TIM2_CH1
+Wire Wire Line
+	7110 1600 7230 1600
+$Comp
+L power:+5V #PWR0109
+U 1 1 5E9ABB64
+P 7230 1600
+F 0 "#PWR0109" H 7230 1450 50  0001 C CNN
+F 1 "+5V" H 7245 1773 50  0000 C CNN
+F 2 "" H 7230 1600 50  0001 C CNN
+F 3 "" H 7230 1600 50  0001 C CNN
+	1    7230 1600
+	1    0    0    -1  
+$EndComp
+Text Label 7470 4800 2    50   ~ 0
+USART_CTS
+Wire Wire Line
+	5710 2370 5710 2500
+Wire Wire Line
+	4870 2370 5710 2370
+Wire Wire Line
+	5710 2500 4950 2500
+Connection ~ 5710 2500
+Wire Wire Line
+	5640 2770 5640 2600
+Wire Wire Line
+	5640 2600 5710 2600
+Wire Wire Line
+	4880 2770 5640 2770
+Wire Wire Line
+	5020 2600 5640 2600
+Connection ~ 5640 2600
+Wire Wire Line
+	8150 2170 8580 2170
+Wire Wire Line
+	8580 2170 8580 2180
+Wire Wire Line
+	7980 2190 7980 2230
+Wire Wire Line
+	7980 2230 8580 2230
+Wire Wire Line
+	8580 2230 8580 2180
+Connection ~ 8580 2180
+Wire Wire Line
+	8580 3280 8190 3280
+Wire Wire Line
+	7870 3390 8500 3390
+Wire Wire Line
+	8500 3390 8500 3320
+Wire Wire Line
+	8500 3320 8580 3320
+Wire Wire Line
+	8580 3320 8580 3280
+Connection ~ 8580 3280
+NoConn ~ 1220 2950
+NoConn ~ 2120 2550
+NoConn ~ 2120 2650
+NoConn ~ 2120 2750
+NoConn ~ 1240 4230
+NoConn ~ 2140 3830
+NoConn ~ 2140 3930
+NoConn ~ 2140 4030
+$Comp
+L power:GND #PWR0110
+U 1 1 5EA80DDE
+P 2140 4230
+F 0 "#PWR0110" H 2140 3980 50  0001 C CNN
+F 1 "GND" H 2145 4057 50  0000 C CNN
+F 2 "" H 2140 4230 50  0001 C CNN
+F 3 "" H 2140 4230 50  0001 C CNN
+	1    2140 4230
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0111
+U 1 1 5EA81652
+P 2140 4130
+F 0 "#PWR0111" H 2140 3880 50  0001 C CNN
+F 1 "GND" V 2145 4002 50  0000 R CNN
+F 2 "" H 2140 4130 50  0001 C CNN
+F 3 "" H 2140 4130 50  0001 C CNN
+	1    2140 4130
+	0    -1   -1   0   
+$EndComp
+$Comp
+L power:GND #PWR0112
+U 1 1 5EA81E1E
+P 2120 2950
+F 0 "#PWR0112" H 2120 2700 50  0001 C CNN
+F 1 "GND" H 2125 2777 50  0000 C CNN
+F 2 "" H 2120 2950 50  0001 C CNN
+F 3 "" H 2120 2950 50  0001 C CNN
+	1    2120 2950
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0113
+U 1 1 5EA8217B
+P 2120 2850
+F 0 "#PWR0113" H 2120 2600 50  0001 C CNN
+F 1 "GND" V 2125 2722 50  0000 R CNN
+F 2 "" H 2120 2850 50  0001 C CNN
+F 3 "" H 2120 2850 50  0001 C CNN
+	1    2120 2850
+	0    -1   -1   0   
+$EndComp
+NoConn ~ 1620 6480
+NoConn ~ 1620 6380
+NoConn ~ 1620 6280
+NoConn ~ 1620 6180
+NoConn ~ 1620 5980
+NoConn ~ 1620 5880
+NoConn ~ 1620 5780
+NoConn ~ 2570 5780
+NoConn ~ 2570 5880
+NoConn ~ 2570 6080
+NoConn ~ 2570 6280
+$Comp
+L power:+5V #PWR0114
+U 1 1 5EA9563C
+P 1220 2550
+F 0 "#PWR0114" H 1220 2400 50  0001 C CNN
+F 1 "+5V" H 1235 2723 50  0000 C CNN
+F 2 "" H 1220 2550 50  0001 C CNN
+F 3 "" H 1220 2550 50  0001 C CNN
+	1    1220 2550
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:+5V #PWR0115
+U 1 1 5EA96099
+P 1240 3830
+F 0 "#PWR0115" H 1240 3680 50  0001 C CNN
+F 1 "+5V" H 1255 4003 50  0000 C CNN
+F 2 "" H 1240 3830 50  0001 C CNN
+F 3 "" H 1240 3830 50  0001 C CNN
+	1    1240 3830
+	1    0    0    -1  
+$EndComp
+$Comp
+L power:GND #PWR0116
+U 1 1 5EA96768
+P 1240 3930
+F 0 "#PWR0116" H 1240 3680 50  0001 C CNN
+F 1 "GND" V 1245 3802 50  0000 R CNN
+F 2 "" H 1240 3930 50  0001 C CNN
+F 3 "" H 1240 3930 50  0001 C CNN
+	1    1240 3930
+	0    1    1    0   
+$EndComp
+$Comp
+L power:GND #PWR0117
+U 1 1 5EA9723F
+P 1220 2650
+F 0 "#PWR0117" H 1220 2400 50  0001 C CNN
+F 1 "GND" V 1225 2522 50  0000 R CNN
+F 2 "" H 1220 2650 50  0001 C CNN
+F 3 "" H 1220 2650 50  0001 C CNN
+	1    1220 2650
+	0    1    1    0   
+$EndComp
+Text Label 600  2750 0    50   ~ 0
+TIM5_CH1
+Wire Wire Line
+	600  2750 1220 2750
+Wire Wire Line
+	600  2850 1220 2850
+Text Label 600  2850 0    50   ~ 0
+TIM5_CH2
+Wire Wire Line
+	720  4030 1240 4030
+Wire Wire Line
+	720  4130 1240 4130
+Text Label 720  4030 0    50   ~ 0
+TIM2_CH2
+Text Label 720  4130 0    50   ~ 0
+TIM2_CH1
+Wire Wire Line
+	5710 2300 5050 2300
+$Comp
+L Device:Jumper JP1
+U 1 1 5EAC569C
+P 3250 6480
+F 0 "JP1" H 3250 6744 50  0000 C CNN
+F 1 "Jumper" H 3250 6653 50  0000 C CNN
+F 2 "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical" H 3250 6480 50  0001 C CNN
+F 3 "~" H 3250 6480 50  0001 C CNN
+	1    3250 6480
 	1    0    0    -1  
 $EndComp
 Wire Wire Line
-	6380 1330 6480 1330
+	3550 6480 3920 6480
+Text Label 3920 6480 2    50   ~ 0
+RESET
 Wire Wire Line
-	6500 1330 6500 1300
+	2570 6380 3050 6380
+Text Label 3050 6380 2    50   ~ 0
+USART_CTS
 Wire Wire Line
-	6500 1300 6610 1300
+	2570 6480 2950 6480
 Wire Wire Line
-	6380 1430 6480 1430
+	2570 6180 3050 6180
 Wire Wire Line
-	6480 1430 6480 1330
-Connection ~ 6480 1330
+	2570 6580 3040 6580
+Text Label 3040 6580 2    50   ~ 0
+USART_RX
 Wire Wire Line
-	6480 1330 6500 1330
-$Comp
-L 3-5338556-1:3-5338556-1 J1
-U 1 1 5E6DB436
-P 860 1040
-F 0 "J1" H 1310 1305 50  0000 C CNN
-F 1 "3-5338556-1" H 1310 1214 50  0000 C CNN
-F 2 "353385561" H 1610 1140 50  0001 L CNN
-F 3 "https://componentsearchengine.com/Datasheets/1/3-5338556-1.pdf" H 1610 1040 50  0001 L CNN
-F 4 "TE Connectivity Female Cat3 RJ45 Modular Jack, STP, Right Angle, PCB Mount Mount, 35338556" H 1610 940 50  0001 L CNN "Description"
-F 5 "13.15" H 1610 840 50  0001 L CNN "Height"
-F 6 "571-3-5338556-1" H 1610 740 50  0001 L CNN "Mouser Part Number"
-F 7 "https://www.mouser.com/Search/Refine.aspx?Keyword=571-3-5338556-1" H 1610 640 50  0001 L CNN "Mouser Price/Stock"
-F 8 "TE Connectivity" H 1610 540 50  0001 L CNN "Manufacturer_Name"
-F 9 "3-5338556-1" H 1610 440 50  0001 L CNN "Manufacturer_Part_Number"
-	1    860  1040
-	1    0    0    -1  
-$EndComp
+	1200 6080 1620 6080
+Text Label 5050 2300 0    50   ~ 0
+RESET
 Wire Wire Line
-	610  810  610  1020
+	7110 4800 7470 4800
 Wire Wire Line
-	610  1020 860  1020
+	8290 4780 8580 4780
 Wire Wire Line
-	860  1020 860  1040
+	8280 4880 8580 4880
+Text Label 8280 4880 0    50   ~ 0
+USART_RX
 Wire Wire Line
-	630  1140 860  1140
-Wire Wire Line
-	720  1240 860  1240
-Wire Wire Line
-	720  1240 720  2550
-Wire Wire Line
-	720  2550 2220 2550
-Wire Wire Line
-	810  1340 860  1340
-Wire Wire Line
-	810  1340 810  2650
-Wire Wire Line
-	810  2650 2350 2650
-$Comp
-L power:GND #PWR0108
-U 1 1 5E7285F3
-P 1910 1300
-F 0 "#PWR0108" H 1910 1050 50  0001 C CNN
-F 1 "GND" H 1915 1127 50  0000 C CNN
-F 2 "" H 1910 1300 50  0001 C CNN
-F 3 "" H 1910 1300 50  0001 C CNN
-	1    1910 1300
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	1760 1340 1790 1340
-Wire Wire Line
-	1810 1340 1810 1300
-Wire Wire Line
-	1810 1300 1910 1300
-Wire Wire Line
-	1760 1440 1790 1440
-Wire Wire Line
-	1790 1440 1790 1340
-Connection ~ 1790 1340
-Wire Wire Line
-	1790 1340 1810 1340
+	10380 5280 10740 5280
 $EndSCHEMATC

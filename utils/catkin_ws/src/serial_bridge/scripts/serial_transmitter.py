@@ -9,7 +9,6 @@ from serial import SerialException
 ser = serial.Serial(
         baudrate=9600,
         parity=serial.PARITY_NONE,
-
         stopbits=serial.STOPBITS_ONE,
         bytesize=serial.EIGHTBITS,
         rtscts=True,
@@ -33,6 +32,9 @@ def listener():
     rospy.init_node('serial_transmitter', anonymous=True, log_level=rospy.DEBUG)
     
     serial_port = rospy.get_param("serial_port")
+    #dtr is connected to RST, on opening dtr is high by default so it resets the st board
+    #after opening the serial port we set it low so the board can boot
+    ser.dtr = 0 
     while(ser.is_open == False and not rospy.is_shutdown()):
         try:
             ser.port = serial_port
