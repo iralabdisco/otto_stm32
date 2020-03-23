@@ -1,11 +1,17 @@
 #!/usr/bin/env python
 
-import rospy, serial, struct, time, datetime
+import time
+
+import serial
 from serial import SerialException
+
 import otto_communication_pb2
 from google.protobuf.message import DecodeError
+
 import math
 from math import sin, cos, pi
+
+import rospy
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Point, Pose, Quaternion, Twist, Vector3
 import tf

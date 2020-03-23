@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 
+import time
 
-import rospy, serial
 import otto_communication_pb2
+
+import rospy
 from geometry_msgs.msg import Twist
+
+import serial
 from serial import SerialException
 
 ser = serial.Serial(
@@ -18,8 +22,8 @@ def callback(data):
     linear = data.linear.x
     angular = -data.angular.z      #da fixare?
     my_velocity = otto_communication_pb2.VelocityCommand()
-    my_velocity.linear_velocity = linear;
-    my_velocity.angular_velocity = angular;
+    my_velocity.linear_velocity = linear
+    my_velocity.angular_velocity = angular
     rospy.logdebug('Cmd vel transmitted %f %f', linear, angular)
     out_buffer = my_velocity.SerializeToString()
     if(ser.cts == True):
