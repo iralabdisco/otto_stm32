@@ -58,6 +58,7 @@ RemoteSystemsTempFiles/
 **/Release
 **/*Debug.launch
 **/*Release.launch
+**/*.launch
 
 #ROS
 devel/

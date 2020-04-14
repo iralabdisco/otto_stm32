@@ -94,11 +94,10 @@ def serial_receiver():
                     odom_values = rotation_matrix.dot(translate_icc_matrix) + translate_back_matrix
                     
                 elif(d_time > 0):
-                    odom_values = numpy.array([odom_values[0]+cos(odom_values[2])*(lin_vel/d_time), 
-                                                odom_values[1]+sin(odom_values[2])*(lin_vel/d_time), 
+                    odom_values = numpy.array([odom_values[0]+(cos(odom_values[2])*(lin_vel*d_time)), 
+                                                odom_values[1]+(sin(odom_values[2])*(lin_vel*d_time)), 
                                                 odom_values[2]])
-
-            
+              
                 current_time = rospy.Time.now()
                 odom_quat = tf.transformations.quaternion_from_euler(0, 0, odom_values[2])
                 odom_broadcaster.sendTransform((odom_values[0], odom_values[1], 0.), odom_quat, current_time, "base_link", "odom")

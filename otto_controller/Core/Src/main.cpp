@@ -84,6 +84,9 @@ Pid cross_pid(50, 20, 0, pid_min, pid_max);
 int left_dutycycle;
 int right_dutycycle;
 
+float left_setpoint = 0;
+float right_setpoint = 0;
+
 //MotorController
 MotorController right_motor(sleep1_GPIO_Port,
 sleep1_Pin,
@@ -96,6 +99,7 @@ sleep2_Pin,
                            dir2_Pin,
                            &htim4, TIM_CHANNEL_3);
 
+//Communication
 uint8_t proto_buffer_rx[50];
 pb_istream_t in_pb_stream;
 
@@ -109,12 +113,7 @@ StatusMessage status_msg;
 bool tx_status;
 float previous_tx_millis;
 
-ConfigCommand config_cmd;
-
 int otto_status = 0;
-
-int test = 0;
-int error = 0;
 
 /* USER CODE END PV */
 
@@ -173,19 +172,20 @@ int main(void)
   left_encoder.Setup();
   right_encoder.Setup();
 
-  left_motor.setup();
-  right_motor.setup();
+  left_motor.Setup();
+  right_motor.Setup();
 
   //right and left motors have the same parameters
-  pid_min = -left_motor.max_dutycycle_;
-  pid_max = left_motor.max_dutycycle_;
+  uint32_t max_dutycycle = *(&htim4.Instance->ARR);
+  pid_min = - (int) max_dutycycle;
+  pid_max = (int) max_dutycycle;
 
-  left_pid.config(180, 200, 0, pid_min, pid_max);
-  right_pid.config(185, 195, 0, pid_min, pid_max);
-  cross_pid.config(50, 20, 0, pid_min, pid_max);
+  left_pid.Config(180, 200, 0, pid_min, pid_max);
+  right_pid.Config(185, 195, 0, pid_min, pid_max);
+  cross_pid.Config(50, 20, 0, pid_min, pid_max);
 
-  left_motor.coast();
-  right_motor.coast();
+  left_motor.Coast();
+  right_motor.Coast();
 
   //protobuffer messages init
   vel_cmd = VelocityCommand_init_zero;
@@ -278,16 +278,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   if (htim->Instance == TIM3) {
 
     left_velocity = left_encoder.GetLinearVelocity();
-    left_dutycycle = left_pid.update(left_velocity);
-    left_motor.set_speed(left_dutycycle);
+    left_dutycycle = left_pid.Update(left_velocity);
+    left_motor.SetSpeed(left_dutycycle);
 
     right_velocity = right_encoder.GetLinearVelocity();
-    right_dutycycle = right_pid.update(right_velocity);
-    right_motor.set_speed(right_dutycycle);
+    right_dutycycle = right_pid.Update(right_velocity);
+    right_motor.SetSpeed(right_dutycycle);
 
     float difference = left_velocity - right_velocity;
 
-    int cross_dutycycle = cross_pid.update(difference);
+    int cross_dutycycle = cross_pid.Update(difference);
 
     left_dutycycle += cross_dutycycle;
     right_dutycycle -= cross_dutycycle;
@@ -302,9 +302,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     float left_wheel = left_encoder.GetLinearVelocity();
     float right_wheel = right_encoder.GetLinearVelocity();
 
-//    odom.FromWheelVelToOdom(left_wheel, right_wheel);
+    odom.FromWheelVelToOdom(left_wheel, right_wheel);
 
-    odom.FromWheelVelToOdom(0.5, -0.5);
+    // used to debug
+    //odom.FromWheelVelToOdom(left_setpoint, right_setpoint);
 
     status_msg.linear_velocity = odom.GetLinearVelocity();
     status_msg.angular_velocity = odom.GetAngularVelocity();
@@ -324,8 +325,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 
-  test++;
-
   float linear_velocity;
   float angular_velocity;
 
@@ -340,14 +339,14 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 
     odom.FromCmdVelToSetpoint(linear_velocity, angular_velocity);
 
-    float left_setpoint = odom.GetLeftVelocity();
-    float right_setpoint = odom.GetRightVelocity();
+    left_setpoint = odom.GetLeftVelocity();
+    right_setpoint = odom.GetRightVelocity();
 
-    left_pid.set(left_setpoint);
-    right_pid.set(right_setpoint);
+    left_pid.Set(left_setpoint);
+    right_pid.Set(right_setpoint);
 
     float cross_setpoint = left_setpoint - right_setpoint;
-    cross_pid.set(cross_setpoint);
+    cross_pid.Set(cross_setpoint);
 
   }
 
@@ -357,6 +356,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 
     //Enables TIM3 interrupt (used for PID control)
     HAL_TIM_Base_Start_IT(&htim3);
+
+    //running
+    otto_status = 3;
   }
 
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
@@ -364,7 +366,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle) {
-  error++;
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &proto_buffer_rx,
   VelocityCommand_size);
 }
@@ -374,8 +375,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
   if (GPIO_Pin == user_button_Pin) {
     //TODO ci può servire il bottone blu?
   } else if (GPIO_Pin == fault1_Pin) {
-    left_motor.brake();
-    right_motor.brake();
+    left_motor.Brake();
+    right_motor.Brake();
     //stop TIM3 interrupt (used for PID control)
     HAL_TIM_Base_Stop_IT(&htim3);
 
@@ -401,8 +402,8 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
       ;
 
   } else if (GPIO_Pin == fault2_Pin) {
-    left_motor.brake();
-    right_motor.brake();
+    left_motor.Brake();
+    right_motor.Brake();
     //stop TIM3 interrupt (used for PID control)
     HAL_TIM_Base_Stop_IT(&htim3);
 

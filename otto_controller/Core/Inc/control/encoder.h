@@ -4,7 +4,7 @@
 #include "main.h"
 
 class Encoder {
- public:
+ private:
   TIM_HandleTypeDef *timer_;
   uint32_t previous_millis_;
   uint32_t current_millis_;
@@ -12,6 +12,7 @@ class Encoder {
   float wheel_circumference_;
   int ticks_per_revolution_;
 
+ public:
   Encoder() {
     timer_ = NULL;
     wheel_circumference_ = 0;
