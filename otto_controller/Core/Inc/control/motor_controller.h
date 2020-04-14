@@ -4,7 +4,7 @@
 #include "main.h"
 
 class MotorController {
- public:
+ private:
   GPIO_TypeDef *sleep_gpio_port_;
   uint16_t sleep_pin_;
   GPIO_TypeDef *dir_gpio_port_;
@@ -13,6 +13,7 @@ class MotorController {
   uint32_t pwm_channel_;
   int32_t max_dutycycle_;
 
+ public:
   MotorController(GPIO_TypeDef *sleep_gpio_port, uint16_t sleep_pin,
                   GPIO_TypeDef *dir_gpio_port, uint16_t dir_pin,
                   TIM_HandleTypeDef *pwm_timer, uint32_t pwm_channel) {
@@ -25,12 +26,12 @@ class MotorController {
     this->max_dutycycle_ = 0;
   }
 
-  void setup() {
+  void Setup() {
     HAL_TIM_PWM_Start(pwm_timer_, pwm_channel_);
     this->max_dutycycle_ = pwm_timer_->Instance->ARR;
   }
 
-  void set_speed(int duty_cycle) {
+  void SetSpeed(int duty_cycle) {
     if (duty_cycle >= 0) {
       //set direction to forward
       HAL_GPIO_WritePin(dir_gpio_port_, dir_pin_, GPIO_PIN_SET);
@@ -57,12 +58,12 @@ class MotorController {
 
   }
 
-  void brake() {
+  void Brake() {
     HAL_GPIO_WritePin(sleep_gpio_port_, sleep_pin_, GPIO_PIN_SET);
     __HAL_TIM_SET_COMPARE(pwm_timer_, pwm_channel_, 0);
   }
 
-  void coast() {
+  void Coast() {
     HAL_GPIO_WritePin(sleep_gpio_port_, sleep_pin_, GPIO_PIN_RESET);
   }
 };

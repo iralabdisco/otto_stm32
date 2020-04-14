@@ -2,7 +2,7 @@
 #define PID_H
 
 class Pid {
- public:
+ private:
   //PID constants
   float kp_;
   float ki_;
@@ -20,6 +20,7 @@ class Pid {
   int min_;
   int max_;
 
+ public:
   Pid(float kp, float ki, float kd, int min, int max) {
     this->kp_ = kp;
     this->ki_ = ki;
@@ -36,7 +37,7 @@ class Pid {
 
   }
 
-  void config(float kp, float ki, float kd, int min, int max) {
+  void Config(float kp, float ki, float kd, int min, int max) {
     this->kp_ = kp;
     this->ki_ = ki;
     this->kd_ = kd;
@@ -52,11 +53,11 @@ class Pid {
 
   }
 
-  void set(float setpoint) {
+  void Set(float setpoint) {
     this->setpoint_ = setpoint;
   }
 
-  int update(float measure) {
+  int Update(float measure) {
 
     this->error_ = this->setpoint_ - measure;
 
