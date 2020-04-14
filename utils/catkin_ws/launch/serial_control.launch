@@ -1,0 +1,11 @@
+<launch>
+  <!-- Serial bridge nodes -->
+  <node name="serial_control" pkg="serial_bridge" type="serial_control.py"/>
+  
+  <!-- Serial port -->  
+  <param name="serial_port" value="/dev/ttyUSB0"/>
+  
+  <!-- Configuration parameters -->
+  
+  
+</launch>
