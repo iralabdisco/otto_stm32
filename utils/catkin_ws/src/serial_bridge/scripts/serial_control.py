@@ -138,6 +138,12 @@ def controller():
             rospy.logerr("Decode Error")
             ser.reset_input_buffer()
 
+def reset_st():
+    ser.dtr = 1
+    time.sleep(1)
+    ser.dtr = 0
+
+rospy.on_shutdown(reset_st)
 
 if __name__ == '__main__':
     controller()
