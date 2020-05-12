@@ -129,10 +129,21 @@ def controller():
 
                 odom_pub.publish(odom)
 
+        if (otto_status.status == 4)
+            rospy.logerr("Pololu Fault 1")
+        if (otto_status.status == 5)
+            rospy.logerr("Pololu Fault 2")
+
         except DecodeError:
             rospy.logerr("Decode Error")
             ser.reset_input_buffer()
 
+def reset_st():
+    ser.dtr = 1
+    time.sleep(1)
+    ser.dtr = 0
+
+rospy.on_shutdown(reset_st)
 
 if __name__ == '__main__':
     controller()
