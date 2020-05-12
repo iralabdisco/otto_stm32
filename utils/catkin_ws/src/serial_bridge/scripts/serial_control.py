@@ -129,6 +129,11 @@ def controller():
 
                 odom_pub.publish(odom)
 
+        if (otto_status.status == 4)
+            rospy.logerr("Pololu Fault 1")
+        if (otto_status.status == 5)
+            rospy.logerr("Pololu Fault 2")
+
         except DecodeError:
             rospy.logerr("Decode Error")
             ser.reset_input_buffer()
