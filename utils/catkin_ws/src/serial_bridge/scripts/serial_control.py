@@ -86,12 +86,12 @@ def controller():
             rospy.logdebug(otto_status)
             
             # 3 = RUNNING
-            if (otto_status.status == 3):
+            if otto_status.status == 3:
                 lin_vel = otto_status.linear_velocity
                 ang_vel = otto_status.angular_velocity
                 d_time = otto_status.delta_millis
                 d_time = d_time / 1000.0
-                if(ang_vel != 0 and d_time > 0):
+                if abs(ang_vel) > 0.0001 and d_time > 0:
                     radius = lin_vel / ang_vel
                     icc_x = (odom_values[0] -radius*sin(odom_values[2]))
                     icc_y = (odom_values[1] + radius*cos(odom_values[2]))
@@ -110,7 +110,7 @@ def controller():
                 
                     odom_values = rotation_matrix.dot(translate_icc_matrix) + translate_back_matrix
                     
-                elif(d_time > 0):
+                elif d_time > 0:
                     odom_values = numpy.array([odom_values[0]+(cos(odom_values[2])*(lin_vel*d_time)), 
                                                 odom_values[1]+(sin(odom_values[2])*(lin_vel*d_time)), 
                                                 odom_values[2]])
@@ -128,11 +128,11 @@ def controller():
                 odom.twist.twist = Twist(Vector3(lin_vel, 0, 0), Vector3(0, 0, ang_vel))
 
                 odom_pub.publish(odom)
-
-        if (otto_status.status == 4)
-            rospy.logerr("Pololu Fault 1")
-        if (otto_status.status == 5)
-            rospy.logerr("Pololu Fault 2")
+        
+            if otto_status.status == 4:
+                rospy.logerr("Pololu Fault 1")
+            if otto_status.status == 5:
+                rospy.logerr("Pololu Fault 2")
 
         except DecodeError:
             rospy.logerr("Decode Error")
