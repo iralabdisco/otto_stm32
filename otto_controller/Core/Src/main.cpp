@@ -100,10 +100,10 @@ sleep2_Pin,
 //Communication
 VelocityMessage vel_msg;
 StatusMessage status_msg;
-
-bool tx_status;
+uint32_t left_ticks;
+uint32_t right_ticks;
 float previous_tx_millis;
-
+uint8_t tx_done_flag = 1;
 int otto_status = 0;
 
 /* USER CODE END PV */
@@ -117,7 +117,6 @@ static void MX_NVIC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint32_t test_receive[] = { 0, 0 };
 /* USER CODE END 0 */
 
 /**
@@ -267,6 +266,12 @@ static void MX_NVIC_Init(void) {
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
   //TIMER 100Hz PID control
+
+  //accumulate ticks for transmission
+  left_ticks += left_encoder.GetCount();
+  right_ticks += right_encoder.GetCount();
+
+  //PID control
   left_velocity = left_encoder.GetLinearVelocity();
   left_dutycycle = left_pid.Update(left_velocity);
   left_motor.SetSpeed(left_dutycycle);
@@ -275,6 +280,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   right_dutycycle = right_pid.Update(right_velocity);
   right_motor.SetSpeed(right_dutycycle);
 
+  //TODO fix cross_pid
   float difference = left_velocity - right_velocity;
 
   int cross_dutycycle = cross_pid.Update(difference);
@@ -284,26 +290,23 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 }
 
-uint8_t tx_flag = 1;
-HAL_StatusTypeDef stato;
-uint32_t crc_rx = 0;
-uint32_t crc_tx = 0;
-uint8_t crc_rx_ok = 0;
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   /*
    * Manage received message
    */
 
+  uint32_t crc_rx = HAL_CRC_Calculate(&hcrc, (uint32_t*) &vel_msg, 8);
+
   float linear_velocity;
   float angular_velocity;
 
-  linear_velocity = vel_msg.linear_velocity;
-  angular_velocity = vel_msg.angular_velocity;
-
-  crc_rx = HAL_CRC_Calculate(&hcrc, (uint32_t*) &vel_msg, 8);
-
   if (crc_rx == vel_msg.crc) {
-    crc_rx_ok = 1;
+    linear_velocity = vel_msg.linear_velocity;
+    angular_velocity = vel_msg.angular_velocity;
+  } else {
+    linear_velocity = 0;
+    angular_velocity = 0;
   }
 
   odom.FromCmdVelToSetpoint(linear_velocity, angular_velocity);
@@ -320,7 +323,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   if (otto_status == 0) {
     //Enables TIM6 interrupt (used for PID control)
     HAL_TIM_Base_Start_IT(&htim6);
-
     //running
     otto_status = 3;
   }
@@ -329,16 +331,14 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
    * Manage new transmission
    */
 
-  float left_wheel = left_encoder.GetLinearVelocity();
-  float right_wheel = right_encoder.GetLinearVelocity();
+  uint32_t left_ticks_tx = left_ticks + left_encoder.GetCount();
+  uint32_t right_ticks_tx = right_ticks + right_encoder.GetCount();
 
-  odom.FromWheelVelToOdom(left_wheel, right_wheel);
+  status_msg.left_ticks = left_ticks_tx;
+  status_msg.right_ticks = right_ticks_tx;
 
-  // used to debug
-  //odom.FromWheelVelToOdom(left_setpoint, right_setpoint);
-
-  status_msg.left_ticks = 22;
-  status_msg.right_ticks = 27;
+  left_ticks = 0;
+  right_ticks = 0;
 
   float current_tx_millis = HAL_GetTick();
   status_msg.delta_millis = current_tx_millis - previous_tx_millis;
@@ -346,28 +346,26 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 
   status_msg.status = 3;
 
-  crc_tx = HAL_CRC_Calculate(&hcrc, (uint32_t*) &status_msg, 12);
+  uint32_t crc_tx = HAL_CRC_Calculate(&hcrc, (uint32_t*) &status_msg, 12);
 
   status_msg.crc = crc_tx;
 
-  if (tx_flag == 1) {
-    stato = HAL_UART_Transmit_DMA(&huart6, (uint8_t*) &status_msg,
-                                  sizeof(status_msg));
-    tx_flag = 0;
+  if (tx_done_flag == 1) {
+    HAL_UART_Transmit_DMA(&huart6, (uint8_t*) &status_msg, sizeof(status_msg));
+    tx_done_flag = 0;
   }
 
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &vel_msg, sizeof(vel_msg));
 }
 
-uint8_t tx_ok = 0;
+
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle) {
-  tx_ok += 1;
-  tx_flag = 1;
+  tx_done_flag = 1;
 }
 
-uint8_t tx_err = 0;
+uint8_t uart_err = 0;
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle) {
-  tx_err += 1;
+  uart_err += 1;
 }
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
@@ -379,21 +377,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     right_motor.Brake();
     //stop TIM6 interrupt (used for PID control)
     HAL_TIM_Base_Stop_IT(&htim6);
-
-    //loops forever, manual reset is needed
-    while (1)
-      ;
-
+    otto_status = 4;
   } else if (GPIO_Pin == fault2_Pin) {
-
     left_motor.Brake();
     right_motor.Brake();
     //stop TIM6 interrupt (used for PID control)
     HAL_TIM_Base_Stop_IT(&htim6);
-
-    //loops forever, manual reset is needed
-    while (1)
-      ;
+    otto_status = 4;
   }
 
 }
