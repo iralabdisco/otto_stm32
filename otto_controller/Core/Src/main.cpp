@@ -55,18 +55,10 @@
 
 /* USER CODE BEGIN PV */
 
-//Parameters
-float baseline = 0.435;
-int ticks_per_revolution = 148000;  //x4 resolution
-float right_wheel_circumference = 0.783;  //in meters
-float left_wheel_circumference = 0.789;  //in meters
-
 //Odometry
-Encoder right_encoder = Encoder(&htim5, right_wheel_circumference,
-                                ticks_per_revolution);
-Encoder left_encoder = Encoder(&htim2, left_wheel_circumference,
-                               ticks_per_revolution);
-Odometry odom = Odometry(baseline);
+Encoder right_encoder;
+Encoder left_encoder;
+Odometry odom;
 
 float left_velocity;
 float right_velocity;
@@ -75,9 +67,9 @@ float right_velocity;
 int pid_min = 0;
 int pid_max = 0;
 
-Pid left_pid(180, 200, 0, pid_min, pid_max);
-Pid right_pid(185, 195, 0, pid_min, pid_max);
-Pid cross_pid(50, 20, 0, pid_min, pid_max);
+Pid left_pid;
+Pid right_pid;
+Pid cross_pid;
 
 int left_dutycycle;
 int right_dutycycle;
@@ -98,13 +90,14 @@ sleep2_Pin,
                            &htim4, TIM_CHANNEL_3);
 
 //Communication
+ConfigMessage config_msg;
 VelocityMessage vel_msg;
 StatusMessage status_msg;
 uint32_t left_ticks;
 uint32_t right_ticks;
 float previous_tx_millis;
 uint8_t tx_done_flag = 1;
-int otto_status = 0;
+uint16_t otto_status = 0;
 
 /* USER CODE END PV */
 
@@ -157,6 +150,24 @@ int main(void) {
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
 
+  //wait for config
+  HAL_StatusTypeDef config_status = HAL_UART_Receive(&huart6, (uint8_t*) &config_msg, sizeof(config_msg), 60*1000);
+  uint32_t config_crc = HAL_CRC_Calculate(&hcrc, (uint32_t*) &config_msg, sizeof(config_msg) - 4);
+  if (config_crc != config_msg.crc || config_status != HAL_OK){
+    status_msg.status = 2;
+    status_msg.crc = HAL_CRC_Calculate(&hcrc, (uint32_t*) &status_msg, sizeof(status_msg) - 4);
+    while(1){
+      HAL_UART_Transmit(&huart6, (uint8_t*) &status_msg, sizeof(status_msg), 1000);
+    }
+  }
+
+  left_encoder = Encoder(&htim2, config_msg.left_wheel_circumference,
+                         config_msg.ticks_per_revolution);
+  right_encoder = Encoder(&htim5, config_msg.right_wheel_circumference,
+                           config_msg.ticks_per_revolution);
+
+  odom = Odometry(config_msg.baseline);
+
   left_encoder.Setup();
   right_encoder.Setup();
 
@@ -168,9 +179,9 @@ int main(void) {
   pid_min = -(int) max_dutycycle;
   pid_max = (int) max_dutycycle;
 
-  left_pid.Config(180, 200, 0, pid_min, pid_max);
-  right_pid.Config(185, 195, 0, pid_min, pid_max);
-  cross_pid.Config(50, 20, 0, pid_min, pid_max);
+  left_pid.Config(config_msg.kp_left, config_msg.ki_left, config_msg.kd_left, pid_min, pid_max);
+  right_pid.Config(config_msg.kp_right, config_msg.ki_right, config_msg.kd_right, pid_min, pid_max);
+  cross_pid.Config(config_msg.kp_cross, config_msg.ki_cross, config_msg.kd_cross, pid_min, pid_max);
 
   left_motor.Coast();
   right_motor.Coast();
@@ -304,9 +315,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   if (crc_rx == vel_msg.crc) {
     linear_velocity = vel_msg.linear_velocity;
     angular_velocity = vel_msg.angular_velocity;
+    otto_status = 1;
   } else {
     linear_velocity = 0;
     angular_velocity = 0;
+    otto_status = 3;
   }
 
   odom.FromCmdVelToSetpoint(linear_velocity, angular_velocity);
@@ -323,8 +336,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   if (otto_status == 0) {
     //Enables TIM6 interrupt (used for PID control)
     HAL_TIM_Base_Start_IT(&htim6);
-    //running
-    otto_status = 3;
   }
 
   /*
@@ -344,7 +355,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   status_msg.delta_millis = current_tx_millis - previous_tx_millis;
   previous_tx_millis = current_tx_millis;
 
-  status_msg.status = 3;
+  status_msg.status = otto_status;
 
   uint32_t crc_tx = HAL_CRC_Calculate(&hcrc, (uint32_t*) &status_msg, 12);
 
