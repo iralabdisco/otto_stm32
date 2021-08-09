@@ -60,22 +60,10 @@ Encoder right_encoder;
 Encoder left_encoder;
 Odometry odom;
 
-float left_velocity;
-float right_velocity;
-
 //PID
-int pid_min = 0;
-int pid_max = 0;
-
 Pid left_pid;
 Pid right_pid;
 Pid cross_pid;
-
-int left_dutycycle;
-int right_dutycycle;
-
-float left_setpoint = 0;
-float right_setpoint = 0;
 
 //MotorController
 MotorController right_motor(sleep1_GPIO_Port,
@@ -93,11 +81,12 @@ sleep2_Pin,
 ConfigMessage config_msg;
 VelocityMessage vel_msg;
 StatusMessage status_msg;
-uint32_t left_ticks;
-uint32_t right_ticks;
-float previous_tx_millis;
-uint8_t tx_done_flag = 1;
-uint16_t otto_status = 0;
+
+volatile int32_t left_ticks;
+volatile int32_t right_ticks;
+volatile float previous_tx_millis;
+volatile uint8_t tx_done_flag = 1;
+volatile uint16_t otto_status = 0;
 
 /* USER CODE END PV */
 
@@ -176,6 +165,8 @@ int main(void) {
 
   //right and left motors have the same parameters
   uint32_t max_dutycycle = *(&htim4.Instance->ARR);
+  int pid_min = 0;
+  int pid_max = 0;
   pid_min = -(int) max_dutycycle;
   pid_max = (int) max_dutycycle;
 
@@ -185,6 +176,9 @@ int main(void) {
 
   left_motor.Coast();
   right_motor.Coast();
+
+  //Enables TIM6 interrupt (used for PID control)
+  HAL_TIM_Base_Start_IT(&htim6);
 
   //Enables UART RX interrupt
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &vel_msg, 12);
@@ -283,25 +277,24 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   right_ticks += right_encoder.GetCount();
 
   //PID control
-  left_velocity = left_encoder.GetLinearVelocity();
-  left_dutycycle = left_pid.Update(left_velocity);
-  left_motor.SetSpeed(left_dutycycle);
+  float left_velocity = left_encoder.GetLinearVelocity();
+  int left_dutycycle = left_pid.Update(left_velocity);
 
-  right_velocity = right_encoder.GetLinearVelocity();
-  right_dutycycle = right_pid.Update(right_velocity);
-  right_motor.SetSpeed(right_dutycycle);
+  float right_velocity = right_encoder.GetLinearVelocity();
+  int right_dutycycle = right_pid.Update(right_velocity);
 
-  //TODO fix cross_pid
   float difference = left_velocity - right_velocity;
-
   int cross_dutycycle = cross_pid.Update(difference);
 
   left_dutycycle += cross_dutycycle;
   right_dutycycle -= cross_dutycycle;
 
+  left_motor.SetSpeed(left_dutycycle);
+  right_motor.SetSpeed(right_dutycycle);
+
 }
 
-
+uint8_t porcoddio = 0;
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   /*
    * Manage received message
@@ -324,8 +317,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 
   odom.FromCmdVelToSetpoint(linear_velocity, angular_velocity);
 
-  left_setpoint = odom.GetLeftVelocity();
-  right_setpoint = odom.GetRightVelocity();
+  float left_setpoint = odom.GetLeftVelocity();
+  float right_setpoint = odom.GetRightVelocity();
 
   left_pid.Set(left_setpoint);
   right_pid.Set(right_setpoint);
@@ -333,17 +326,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   float cross_setpoint = left_setpoint - right_setpoint;
   cross_pid.Set(cross_setpoint);
 
-  if (otto_status == 0) {
-    //Enables TIM6 interrupt (used for PID control)
-    HAL_TIM_Base_Start_IT(&htim6);
-  }
-
   /*
    * Manage new transmission
    */
 
-  uint32_t left_ticks_tx = left_ticks + left_encoder.GetCount();
-  uint32_t right_ticks_tx = right_ticks + right_encoder.GetCount();
+  int32_t left_ticks_tx = left_ticks + left_encoder.GetCount();
+  int32_t right_ticks_tx = right_ticks + right_encoder.GetCount();
 
   status_msg.left_ticks = left_ticks_tx;
   status_msg.right_ticks = right_ticks_tx;

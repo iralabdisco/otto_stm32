@@ -42,8 +42,8 @@ typedef struct _StatusMessage {
    */
   uint16_t status;
   uint16_t delta_millis;
-  uint32_t left_ticks;
-  uint32_t right_ticks;
+  int32_t left_ticks;
+  int32_t right_ticks;
   uint32_t crc;
 } StatusMessage;
 
