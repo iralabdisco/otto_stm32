@@ -9,7 +9,7 @@ The main program is located in [otto_controller](https://github.com/iralabdisco/
 If you just want to use the robot you can download the binary file from the [releases](https://github.com/iralabdisco/otto/releases): 
 
 1. Download the lastest otto_controller.bin
-2. Plug your Nucleo boart to the PC.
+2. Plug your Nucleo board in your PC.
 3. Copy and paste the .bin file inside your board.
 
 ## Coding a driver for otto
