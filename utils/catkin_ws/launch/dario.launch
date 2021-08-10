@@ -1,8 +1,0 @@
-<launch>
-  <include file="serial_bridge.launch" />  
-  <!-- Used to receive cmd_vel from Arduino -->
-  <node name="rosserial_python" pkg="rosserial_python" type="serial_node.py">
-	  <param name="port" value="/dev/ttyUSB1" />
-  </node>
-  
-</launch>
