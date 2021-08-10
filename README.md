@@ -16,6 +16,14 @@ If you just want to use the robot you can download the binary file from the [rel
 
 You will need to have a way to open a serial port on your PC.
 
+Serial port configuration:
+
+- Baud rate: 115200
+- Parity: No
+- Stop bit: 1
+- Data bits: 8
+- Hardware flow control: disabled
+
 1. Before doing anything reset the MCU using the DTR pin in the serial port.
 2. The MCU will then wait to receive a ConfigMessage.
 3. After the config message is received the PID loop control starts.
