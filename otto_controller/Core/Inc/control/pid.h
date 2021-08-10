@@ -21,6 +21,20 @@ class Pid {
   int max_;
 
  public:
+  Pid() {
+    this->kp_ = 0;
+    this->ki_ = 0;
+    this->kd_ = 0;
+
+    this->error_ = 0;
+    this->setpoint_ = 0;
+
+    this->previous_error_ = 0;
+    this->error_sum_ = 0;
+
+    this->min_ = 0;
+    this->max_ = 0;
+  }
   Pid(float kp, float ki, float kd, int min, int max) {
     this->kp_ = kp;
     this->ki_ = ki;
@@ -78,7 +92,7 @@ class Pid {
     if (integer_output > this->max_) {
       integer_output = this->max_;
       this->error_sum_ -= this->error_;
-    } else if (integer_output < this->min_){
+    } else if (integer_output < this->min_) {
       integer_output = this->min_;
       this->error_sum_ -= this->error_;
     }
