@@ -35,7 +35,7 @@ The CRC standard used is CRC-32/MPEG-2, tested with python package [crccheck](ht
 
 ## Coding style
 
+## Coding style
 Follow [Google C++ guideline](https://google.github.io/styleguide/cppguide.html) while working on the project
 
 Eclipse's formatting configuration file can be found [here](https://github.com/google/styleguide/blob/gh-pages/eclipse-cpp-google-style.xml)
-
