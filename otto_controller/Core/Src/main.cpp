@@ -19,6 +19,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "adc.h"
 #include "crc.h"
 #include "dma.h"
 #include "tim.h"
@@ -87,6 +88,7 @@ volatile int32_t right_ticks;
 volatile float previous_tx_millis;
 volatile uint8_t tx_done_flag = 1;
 volatile uint16_t otto_status = 0;
+volatile uint16_t counter = 0;
 
 /* USER CODE END PV */
 
@@ -102,10 +104,11 @@ static void MX_NVIC_Init(void);
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
-int main(void) {
+  * @brief  The application entry point.
+  * @retval int
+  */
+int main(void)
+{
   /* USER CODE BEGIN 1 */
   /* USER CODE END 1 */
 
@@ -134,6 +137,7 @@ int main(void) {
   MX_USART6_UART_Init();
   MX_TIM6_Init();
   MX_CRC_Init();
+  MX_ADC1_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
@@ -196,21 +200,22 @@ int main(void) {
 }
 
 /**
- * @brief System Clock Configuration
- * @retval None
- */
-void SystemClock_Config(void) {
-  RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = { 0 };
+  * @brief System Clock Configuration
+  * @retval None
+  */
+void SystemClock_Config(void)
+{
+  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
   /** Configure the main internal regulator output voltage
-   */
+  */
   __HAL_RCC_PWR_CLK_ENABLE();
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
   /** Initializes the RCC Oscillators according to the specified parameters
-   * in the RCC_OscInitTypeDef structure.
-   */
+  * in the RCC_OscInitTypeDef structure.
+  */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
@@ -221,38 +226,43 @@ void SystemClock_Config(void) {
   RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
   RCC_OscInitStruct.PLL.PLLQ = 2;
   RCC_OscInitStruct.PLL.PLLR = 2;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
+  {
     Error_Handler();
   }
   /** Activate the Over-Drive mode
-   */
-  if (HAL_PWREx_EnableOverDrive() != HAL_OK) {
+  */
+  if (HAL_PWREx_EnableOverDrive() != HAL_OK)
+  {
     Error_Handler();
   }
   /** Initializes the CPU, AHB and APB buses clocks
-   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
-      | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
+                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK) {
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_7) != HAL_OK)
+  {
     Error_Handler();
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART6;
   PeriphClkInitStruct.Usart6ClockSelection = RCC_USART6CLKSOURCE_PCLK2;
-  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK) {
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
+  {
     Error_Handler();
   }
 }
 
 /**
- * @brief NVIC Configuration.
- * @retval None
- */
-static void MX_NVIC_Init(void) {
+  * @brief NVIC Configuration.
+  * @retval None
+  */
+static void MX_NVIC_Init(void)
+{
   /* TIM6_DAC_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(TIM6_DAC_IRQn, 1, 2);
   HAL_NVIC_EnableIRQ(TIM6_DAC_IRQn);
@@ -273,8 +283,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
   //TIMER 100Hz PID control
 
   //accumulate ticks for transmission
-  left_ticks += left_encoder.GetCount();
-  right_ticks += right_encoder.GetCount();
+	int32_t left_encoder_tick = left_encoder.GetCount();
+	int32_t right_encoder_tick = right_encoder.GetCount();
+
+  left_ticks += left_encoder_tick;
+  right_ticks += right_encoder_tick;
 
   //PID control
   float left_velocity = left_encoder.GetLinearVelocity();
@@ -306,19 +319,52 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   float angular_velocity;
 
   if (crc_rx == vel_msg.crc) {
-    linear_velocity = vel_msg.linear_velocity;
-    angular_velocity = vel_msg.angular_velocity;
-    otto_status = 1;
+	  linear_velocity = vel_msg.linear_velocity;
+	  angular_velocity = vel_msg.angular_velocity;
+	  otto_status = 1;
   } else {
-    linear_velocity = 0;
-    angular_velocity = 0;
-    otto_status = 3;
+	  linear_velocity = 0;
+	  angular_velocity = 0;
+	  otto_status = 3;
   }
+
 
   odom.FromCmdVelToSetpoint(linear_velocity, angular_velocity);
 
   float left_setpoint = odom.GetLeftVelocity();
   float right_setpoint = odom.GetRightVelocity();
+
+  int32_t left_ticks_tx = left_ticks + left_encoder.GetCount();
+  int32_t right_ticks_tx = right_ticks + right_encoder.GetCount();
+
+  //watch dog for encoder
+  if (left_ticks_tx == 0 ||right_ticks_tx == 0){
+  	otto_status = 5;
+  }
+
+
+  if(otto_status == 5){
+	  if(left_setpoint != 0 || right_setpoint != 0){
+		  counter ++;
+	  }
+	  otto_status = 1;
+  } else if(otto_status == 3){
+	  counter = 0;
+  } else{
+	  counter = 0;
+	  otto_status = 1;
+  }
+
+
+  if (counter == 10){
+   	  otto_status = 5;
+   	  left_motor.Brake();
+   	  right_motor.Brake();
+   //stop TIM6 interrupt (used for PID control)
+   	  HAL_TIM_Base_Stop_IT(&htim6);
+  }else{
+  	  otto_status = 1;
+  }
 
   left_pid.Set(left_setpoint);
   right_pid.Set(right_setpoint);
@@ -326,15 +372,18 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   float cross_setpoint = left_setpoint - right_setpoint;
   cross_pid.Set(cross_setpoint);
 
+
+
+
   /*
    * Manage new transmission
    */
 
-  int32_t left_ticks_tx = left_ticks + left_encoder.GetCount();
-  int32_t right_ticks_tx = right_ticks + right_encoder.GetCount();
+
 
   status_msg.left_ticks = left_ticks_tx;
   status_msg.right_ticks = right_ticks_tx;
+
 
   left_ticks = 0;
   right_ticks = 0;
@@ -342,6 +391,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   float current_tx_millis = HAL_GetTick();
   status_msg.delta_millis = current_tx_millis - previous_tx_millis;
   previous_tx_millis = current_tx_millis;
+
+
 
   status_msg.status = otto_status;
 
@@ -389,10 +440,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 /* USER CODE END 4 */
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
-void Error_Handler(void) {
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
+void Error_Handler(void)
+{
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
 
