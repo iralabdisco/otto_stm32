@@ -26,6 +26,7 @@
 #include "usart.h"
 #include "gpio.h"
 
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -88,7 +89,10 @@ volatile int32_t right_ticks;
 volatile float previous_tx_millis;
 volatile uint8_t tx_done_flag = 1;
 volatile uint16_t otto_status = 0;
-volatile uint16_t counter = 0;
+volatile uint16_t encoder_counter = 0;
+volatile int32_t adc1_val;
+volatile int32_t adc2_val;
+
 
 /* USER CODE END PV */
 
@@ -101,6 +105,7 @@ static void MX_NVIC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
 /* USER CODE END 0 */
 
 /**
@@ -138,6 +143,8 @@ int main(void)
   MX_TIM6_Init();
   MX_CRC_Init();
   MX_ADC1_Init();
+  MX_ADC2_Init();
+  MX_TIM8_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
@@ -180,6 +187,13 @@ int main(void)
 
   left_motor.Coast();
   right_motor.Coast();
+
+  //start ADC
+  HAL_ADC_Start_IT(&hadc1);
+  HAL_ADC_Start_IT(&hadc2);
+
+  // start timer for ADC
+  HAL_TIM_PWM_Start(&htim8, TIM_CHANNEL_1);
 
   //Enables TIM6 interrupt (used for PID control)
   HAL_TIM_Base_Start_IT(&htim6);
@@ -280,14 +294,12 @@ static void MX_NVIC_Init(void)
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
+	 if(htim->Instance == TIM6)  {
   //TIMER 100Hz PID control
 
   //accumulate ticks for transmission
-	int32_t left_encoder_tick = left_encoder.GetCount();
-	int32_t right_encoder_tick = right_encoder.GetCount();
-
-  left_ticks += left_encoder_tick;
-  right_ticks += right_encoder_tick;
+  left_ticks += left_encoder.GetCount();
+  right_ticks += right_encoder.GetCount();
 
   //PID control
   float left_velocity = left_encoder.GetLinearVelocity();
@@ -304,6 +316,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
   left_motor.SetSpeed(left_dutycycle);
   right_motor.SetSpeed(right_dutycycle);
+	 }
 
 }
 
@@ -319,20 +332,29 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   float angular_velocity;
 
   if (crc_rx == vel_msg.crc) {
-	  linear_velocity = vel_msg.linear_velocity;
-	  angular_velocity = vel_msg.angular_velocity;
-	  otto_status = 1;
+    linear_velocity = vel_msg.linear_velocity;
+    angular_velocity = vel_msg.angular_velocity;
+    otto_status = 1;
   } else {
-	  linear_velocity = 0;
-	  angular_velocity = 0;
-	  otto_status = 3;
+    linear_velocity = 0;
+    angular_velocity = 0;
+    otto_status = 3;
   }
-
 
   odom.FromCmdVelToSetpoint(linear_velocity, angular_velocity);
 
   float left_setpoint = odom.GetLeftVelocity();
   float right_setpoint = odom.GetRightVelocity();
+
+  left_pid.Set(left_setpoint);
+  right_pid.Set(right_setpoint);
+
+  float cross_setpoint = left_setpoint - right_setpoint;
+  cross_pid.Set(cross_setpoint);
+
+  /*
+   * Manage new transmission
+   */
 
   int32_t left_ticks_tx = left_ticks + left_encoder.GetCount();
   int32_t right_ticks_tx = right_ticks + right_encoder.GetCount();
@@ -345,44 +367,25 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
 
   if(otto_status == 5){
 	  if(left_setpoint != 0 || right_setpoint != 0){
-		  counter ++;
+		  encoder_counter ++;
 	  }
 	  otto_status = 1;
-  } else if(otto_status == 3){
-	  counter = 0;
   } else{
-	  counter = 0;
-	  otto_status = 1;
+	  encoder_counter = 0;
   }
 
 
-  if (counter == 10){
+  if (encoder_counter == 10){
    	  otto_status = 5;
    	  left_motor.Brake();
    	  right_motor.Brake();
    //stop TIM6 interrupt (used for PID control)
    	  HAL_TIM_Base_Stop_IT(&htim6);
-  }else{
-  	  otto_status = 1;
   }
 
-  left_pid.Set(left_setpoint);
-  right_pid.Set(right_setpoint);
 
-  float cross_setpoint = left_setpoint - right_setpoint;
-  cross_pid.Set(cross_setpoint);
-
-
-
-
-  /*
-   * Manage new transmission
-   */
-
-
-
-  status_msg.left_ticks = left_ticks_tx;
-  status_msg.right_ticks = right_ticks_tx;
+  status_msg.left_ticks = adc1_val;//left_ticks_tx;
+  status_msg.right_ticks = adc2_val;//right_ticks_tx;
 
 
   left_ticks = 0;
@@ -391,8 +394,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   float current_tx_millis = HAL_GetTick();
   status_msg.delta_millis = current_tx_millis - previous_tx_millis;
   previous_tx_millis = current_tx_millis;
-
-
 
   status_msg.status = otto_status;
 
@@ -436,6 +437,16 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
     otto_status = 4;
   }
 
+}
+
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
+{
+	 if(hadc->Instance == ADC1)  {
+		 adc1_val =static_cast<int32_t> (HAL_ADC_GetValue(&hadc1));
+
+	 } else{
+		 adc2_val = static_cast<int32_t>(HAL_ADC_GetValue(&hadc2));
+	 }
 }
 /* USER CODE END 4 */
 
