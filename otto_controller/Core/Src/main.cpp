@@ -96,8 +96,8 @@ volatile int32_t adc2_val;
 volatile double exp_1 =0;
 volatile double exp_2 =0;
 const float alpha = 0.1f;
-
-
+volatile uint32_t adc1_counter =0;
+volatile uint32_t adc2_counter =0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -455,7 +455,19 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 		 exp_2 = exp_2 + alpha*(adc1_val-exp_2);
 	 }
 
-	 if (exp_2>=400 || exp_2>=400){
+	 if (exp_1>=400){
+		 adc1_counter ++;
+	 }else{
+		 adc1_counter =0;
+	 }
+
+	 if (exp_2>=400){
+		 adc2_counter ++;
+	 }else{
+		 adc2_counter =0;
+	 }
+
+	 if(adc1_counter >= 40000 || adc2_counter >= 40000){
 		 HAL_TIM_Base_Stop_IT(&htim6);
 		 left_motor.Brake();
 		 right_motor.Brake();
