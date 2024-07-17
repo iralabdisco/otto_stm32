@@ -89,9 +89,13 @@ volatile int32_t right_ticks;
 volatile float previous_tx_millis;
 volatile uint8_t tx_done_flag = 1;
 volatile uint16_t otto_status = 0;
-volatile uint16_t encoder_counter = 0;
+volatile uint16_t encoder_counter1 = 0;
+volatile uint16_t encoder_counter2 = 0;
 volatile int32_t adc1_val;
 volatile int32_t adc2_val;
+volatile double exp_1 =0;
+volatile double exp_2 =0;
+const float alpha = 0.1f;
 
 
 /* USER CODE END PV */
@@ -320,7 +324,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 }
 
-uint8_t porcoddio = 0;
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   /*
    * Manage received message
@@ -360,32 +363,29 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
   int32_t right_ticks_tx = right_ticks + right_encoder.GetCount();
 
   //watch dog for encoder
-  if (left_ticks_tx == 0 ||right_ticks_tx == 0){
-  	otto_status = 5;
+  if (left_ticks_tx == 0 && left_setpoint !=0){
+	  encoder_counter1++;
+  }else{
+	  encoder_counter1 =0;
   }
 
-
-  if(otto_status == 5){
-	  if(left_setpoint != 0 || right_setpoint != 0){
-		  encoder_counter ++;
-	  }
-	  otto_status = 1;
-  } else{
-	  encoder_counter = 0;
+  if (right_ticks_tx == 0 && right_setpoint !=0){
+	  encoder_counter2++;
+  }else{
+	  encoder_counter2 =0;
   }
+  if (encoder_counter1 == 10 || encoder_counter2 == 10){
 
-
-  if (encoder_counter == 10){
-   	  otto_status = 5;
+   	  HAL_TIM_Base_Stop_IT(&htim6);
    	  left_motor.Brake();
    	  right_motor.Brake();
-   //stop TIM6 interrupt (used for PID control)
-   	  HAL_TIM_Base_Stop_IT(&htim6);
+   	  otto_status = 5;
+
   }
 
 
-  status_msg.left_ticks = adc1_val;//left_ticks_tx;
-  status_msg.right_ticks = adc2_val;//right_ticks_tx;
+  status_msg.left_ticks = left_ticks_tx;
+  status_msg.right_ticks = right_ticks_tx;
 
 
   left_ticks = 0;
@@ -405,6 +405,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
     HAL_UART_Transmit_DMA(&huart6, (uint8_t*) &status_msg, sizeof(status_msg));
     tx_done_flag = 0;
   }
+
+  if (otto_status == 5){
+	  while(1);
+  }
+
 
   HAL_UART_Receive_DMA(&huart6, (uint8_t*) &vel_msg, sizeof(vel_msg));
 }
@@ -443,9 +448,19 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
 	 if(hadc->Instance == ADC1)  {
 		 adc1_val =static_cast<int32_t> (HAL_ADC_GetValue(&hadc1));
+		 exp_1 = exp_1 + alpha*(adc1_val-exp_1);
 
 	 } else{
 		 adc2_val = static_cast<int32_t>(HAL_ADC_GetValue(&hadc2));
+		 exp_2 = exp_2 + alpha*(adc1_val-exp_2);
+	 }
+
+	 if (exp_2>=400 || exp_2>=400){
+		 HAL_TIM_Base_Stop_IT(&htim6);
+		 left_motor.Brake();
+		 right_motor.Brake();
+		 otto_status = 6;
+		 while(1);
 	 }
 }
 /* USER CODE END 4 */
