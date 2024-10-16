@@ -91,8 +91,8 @@ volatile uint8_t tx_done_flag = 1;
 volatile uint16_t otto_status = 0;
 volatile uint16_t encoder_counter1 = 0;
 volatile uint16_t encoder_counter2 = 0;
-volatile int32_t adc1_val;
-volatile int32_t adc2_val;
+volatile uint32_t adc1_val;
+volatile uint32_t adc2_val;
 volatile double exp_1 =0;
 volatile double exp_2 =0;
 const float alpha = 0.1f;
@@ -447,11 +447,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 {
 	 if(hadc->Instance == ADC1)  {
-		 adc1_val =static_cast<int32_t> (HAL_ADC_GetValue(&hadc1));
+		 adc1_val =HAL_ADC_GetValue(&hadc1);
 		 exp_1 = exp_1 + alpha*(adc1_val-exp_1);
 
 	 } else{
-		 adc2_val = static_cast<int32_t>(HAL_ADC_GetValue(&hadc2));
+		 adc2_val = HAL_ADC_GetValue(&hadc2);
 		 exp_2 = exp_2 + alpha*(adc1_val-exp_2);
 	 }
 
@@ -472,7 +472,6 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
 		 left_motor.Brake();
 		 right_motor.Brake();
 		 otto_status = 6;
-		 while(1);
 	 }
 }
 /* USER CODE END 4 */
