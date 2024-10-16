@@ -406,7 +406,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle) {
     tx_done_flag = 0;
   }
 
-  if (otto_status == 5){
+  if (otto_status == 5 || otto_status == 6){
 	  while(1);
   }
 
